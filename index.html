@@ -613,9 +613,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,
                 <div style="flex:1 1 160px;max-width:200px;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
                   <h2 style="margin:6px 0 0;font-size:14px;font-weight:700;color:var(--ink)">{{ sec.title }}</h2>
                   <sc-if value="{{ sec.scan }}" hint-placeholder-val="{{ false }}">
-                    <label for="{{ sec.scanId }}" class="btn btn-soft" style="cursor:pointer;font-size:13px;font-weight:600;padding:8px 12px;gap:6px">
+                    <button onClick="{{ sec.openCam }}" class="btn btn-dark" style="font-size:13px;padding:8px 12px;gap:6px">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M7 12h10"></path></svg>
-                      {{ sec.scanLabel }}</label>
+                      {{ sec.scanLabel }}</button>
+                    <label for="{{ sec.scanId }}" class="btn btn-ghost" style="cursor:pointer;font-size:12px;font-weight:600;padding:4px 6px;color:var(--blue)">{{ sec.uploadLabel }}</label>
                     <input id="{{ sec.scanId }}" type="file" accept="image/*" capture="environment" onChange="{{ sec.onScan }}" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden">
                     <span style="font-size:11px;color:var(--muted);line-height:1.35">{{ sec.scanHint }}</span>
                   </sc-if>
@@ -823,6 +824,23 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,
           </section>
         </div>
       </sc-if>
+      <sc-if value="{{ cam.open }}" hint-placeholder-val="{{ false }}">
+        <div role="dialog" aria-modal="true" aria-label="{{ cam.title }}" style="position:fixed;inset:0;background:rgba(10,12,20,.88);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px">
+          <div style="color:#fff;font-weight:700;font-size:17px;text-align:center">{{ cam.title }}</div>
+          <div style="position:relative;width:min(94vw,760px);aspect-ratio:4/3;background:#000;border-radius:16px;overflow:hidden">
+            <video ref="{{ cam.ref }}" autoPlay="true" playsInline="true" muted="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain"></video>
+            <div aria-hidden="true" style="position:absolute;left:5%;width:90%;top:50%;transform:translateY(-50%);aspect-ratio:1.42;border:3px solid #fff;border-radius:14px;box-shadow:0 0 0 2000px rgba(0,0,0,.35)">
+              <sc-if value="{{ cam.mrz }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:4%;right:4%;bottom:6%;height:30%;border:2px dashed #FBBF24;border-radius:8px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;color:#FBBF24;font:700 13px Inter,sans-serif">&lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt;</div></sc-if>
+            </div>
+            <sc-if value="{{ cam.busy }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#2F45E8;color:#fff;border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700">{{ t.camReading }}</div></sc-if>
+          </div>
+          <div role="status" style="color:#E5E7EB;font-size:14px;text-align:center;max-width:620px;min-height:20px">{{ cam.msg }}</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+            <button onClick="{{ cam.shot }}" class="btn btn-blue" style="padding:12px 22px;font-size:15px">{{ t.camShot }}</button>
+            <button onClick="{{ cam.close }}" class="btn btn-soft" style="padding:12px 22px;font-size:15px">{{ t.camClose }}</button>
+          </div>
+        </div>
+      </sc-if>
     </main>
   </div>
 </div>
@@ -911,7 +929,7 @@ const L = {
   edKicker:"Bilim bazasi · shablon muharriri", edHelp:"Matnni Word'dagidek yozing va tahrirlang. Ma'lumot yozilishi kerak bo'lgan joyni bosing (yoki ______ chiziqni sichqoncha bilan belgilang) va «Maydonlar» qatoridagi tugmani bosing. Hujjat tuzilganda o'sha joyga haydovchi ma'lumoti yoziladi.",
   edImport:"~Word~ fayldan ochish", edDefault:"Standart shakl", edUndo:"Ortga", edRedo:"Qaytarish", edBold:"Qalin", edItalic:"Qiya", edUnder:"Tagiga chizish",
   edSize:"Shrift:", edLeft:"Chapga", edCenter:"Markazga", edRight:"O'ngga", edJustify:"Ikki tomonga", edBlank:"____ chiziq", edBlankHint:"Bo'sh chiziq qo'yish",
-  edTable:"Jadval:", edRowAdd:"+ qator", edRowDel:"− qator", edColAdd:"+ ustun", edColDel:"− ustun", edTableAdd:"Yangi jadval", edFields:"Maydonlar:", setNav:"Sozlamalar", setTitle:"Sozlamalar", setSub:"Ma'lumotlar Google Sheets jadvalida saqlanadi — barcha kompyuterlarda bir xil ko'rinadi.",
+  edTable:"Jadval:", edRowAdd:"+ qator", edRowDel:"− qator", edColAdd:"+ ustun", edColDel:"− ustun", edTableAdd:"Yangi jadval", edFields:"Maydonlar:", setNav:"Sozlamalar", camShot:"Suratga olish", camClose:"Yopish", camReading:"O'qilmoqda…", setTitle:"Sozlamalar", setSub:"Ma'lumotlar Google Sheets jadvalida saqlanadi — barcha kompyuterlarda bir xil ko'rinadi.",
   setUrl:"Google Apps Script veb-ilova manzili (URL)", setToken:"Parol", setTokenPh:"Apps Script'dagi PAROL", setFirm:"Firma nomi",
   setSave:"Saqlash va ulanish", setPush:"Hozirgi ma'lumotlarni Sheets'ga yuborish", setPull:"Sheets'dan qayta yuklash", setOff:"Uzish",
   setHowTitle:"Google Sheets'ni qanday ulash kerak", setCodeLink:"Apps Script kodini ochish (Code.gs) →", edPage:"+ yangi varaq"
@@ -1394,7 +1412,10 @@ const errText = e => {const m=String((e&&e.message)||e);return m==='parol'?"paro
 const TESS = {workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1',langPath:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng@1.0.0/4.0.0_best_int'};
 function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=u;});}
 function prepCanvas(im,part,mode){
-  const sx=0,sy=part==='bottom'?Math.round(im.height*0.55):0,sw=im.width,sh=part==='bottom'?im.height-sy:im.height;
+  const W0=im.videoWidth||im.width,H0=im.videoHeight||im.height;let sx=0,sy=0,sw=W0,sh=H0;
+  if(part==='bottom'){sy=Math.round(H0*0.55);sh=H0-sy;}
+  if(part==='guide'||part==='guideBottom'){sw=Math.round(W0*0.9);sh=Math.min(H0,Math.round(sw/1.42));sx=Math.round((W0-sw)/2);sy=Math.round((H0-sh)/2);
+    if(part==='guideBottom'){const d=Math.round(sh*0.55);sy+=d;sh-=d;}}
   const k=Math.min(3,Math.max(1,1800/sw));const c=document.createElement('canvas');c.width=Math.round(sw*k);c.height=Math.round(sh*k);
   const g=c.getContext('2d');g.drawImage(im,sx,sy,sw,sh,0,0,c.width,c.height);
   const d=g.getImageData(0,0,c.width,c.height),p=d.data;
@@ -1592,45 +1613,79 @@ class Component extends DCLogic {
     finally{try{host.remove();}catch(e){}}
   }
   async ocrWorker(){if(this._ocr)return this._ocr;if(!window.Tesseract)throw new Error('nolib');this._ocr=await window.Tesseract.createWorker('eng',1,TESS);return this._ocr;}
+  async readDoc(kind,im,variants){
+    const w=await this.ocrWorker();
+    if(kind==='mrz'){
+      let r=null;
+      await w.setParameters({tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',tessedit_pageseg_mode:'6'});
+      for(const [part,mode] of (variants||[['bottom','gray'],['bottom','bin'],['full','gray'],['full','bin']])){
+        const {data}=await w.recognize(prepCanvas(im,part,mode));const x=parseMRZ(data.text);
+        if(x&&(!r||x.ok))r=x;if(r&&r.ok)break;
+      }
+      if(!r)throw new Error('mrz');
+      return {ok:r.ok,patch:{familiya:r.surname,ism:r.given,hujjatTuri:r.type==='id'?'ID karta':'Biometrik pasport',hujjatSeriya:r.doc.slice(0,2),hujjatRaqam:r.doc.slice(2),
+          jshshir:/^\d{14}$/.test(r.pin)?r.pin:'',tugilgan:r.dobIso,hujjatMuddat:r.expIso},
+        msg:r.ok?"Hujjat o'qildi: "+r.surname+' '+r.given+', '+r.doc+". Otasining ismini va manzilni qo'lda yozing.":"Hujjat o'qildi, lekin ayrim belgilar shubhali — maydonlarni tekshiring yoki qayta, aniqroq suratga oling."};
+    }
+    await w.setParameters({tessedit_char_whitelist:'',tessedit_pageseg_mode:'3'});
+    const {data}=await w.recognize(prepCanvas(im,(variants&&variants[0]&&variants[0][0])||'full','gray'));
+    const p=kind==='prava'?parsePrava(data.text):parseTex(data.text);
+    const ef=this.state.eForm||{};
+    if(p._fam&&!ef.familiya)p.familiya=p._fam;if(p._ism&&!ef.ism)p.ism=p._ism;delete p._fam;delete p._ism;
+    const n=Object.keys(p).length;if(!n)throw new Error('text');
+    return {ok:true,patch:p,msg:n+" ta maydon to'ldirildi. Rasmdagi yozuvdan o'qildi — iltimos, har birini tekshiring."};
+  }
+  applyScan(res){const patch={...res.patch};Object.keys(patch).forEach(k=>{if(patch[k]==null||patch[k]==='')delete patch[k];});
+    this.setState(st=>({scanBusy:false,eForm:{...(st.eForm||blankE(st.ent)),...patch},scanMsg:{ok:1,text:res.msg}}));}
+  scanErr(err){const m=err&&err.message;
+    return m==='nolib'?"Matnni o'qish kutubxonasi yuklanmadi. Internetni tekshiring va sahifani yangilang.":m==='mrz'?"Pastdagi <<< qatorlari topilmadi. Hujjatni tekis qo'yib, yorug' joyda, qatorlar to'liq tushadigan qilib qayta suratga oling.":"Rasmdan kerakli ma'lumot topilmadi. Aniqroq, yaqinroq suratga olib qayta urinib ko'ring yoki qo'lda kiriting.";}
   async scanDoc(kind,e){
     const file=e.target.files&&e.target.files[0];try{e.target.value='';}catch(x){}
     if(!file)return;
     this.setState({scanBusy:true,scanMsg:{ok:2,text:"Hujjat o'qilmoqda… (birinchi marta 10–20 soniya ketishi mumkin)"}});
+    try{this.applyScan(await this.readDoc(kind,await loadImg(file)));}
+    catch(err){this.setState({scanBusy:false,scanMsg:{ok:0,text:this.scanErr(err)}});}
+  }
+  /* jonli kamera */
+  camRefCb=el=>{this.camEl=el;if(el&&this.camStream&&el.srcObject!==this.camStream){el.srcObject=this.camStream;el.muted=true;el.setAttribute('playsinline','');try{el.play();}catch(e){}}};
+  async openCam(kind){
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){this.setState({scanMsg:{ok:0,text:"Bu brauzerda kamera ishlamaydi. «Rasm yuklash» tugmasidan foydalaning."}});return;}
+    this.setState({cam:{kind,msg:"Kamera ochilmoqda…"}});
     try{
-      const im=await loadImg(file);const w=await this.ocrWorker();let patch={},msg='';
-      if(kind==='mrz'){
-        let r=null;
-        await w.setParameters({tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',tessedit_pageseg_mode:'6'});
-        for(const [part,mode] of [['bottom','gray'],['bottom','bin'],['full','gray'],['full','bin']]){
-          const {data}=await w.recognize(prepCanvas(im,part,mode));const x=parseMRZ(data.text);
-          if(x&&(!r||x.ok))r=x;if(r&&r.ok)break;
-        }
-        if(!r)throw new Error('mrz');
-        patch={familiya:r.surname,ism:r.given,hujjatTuri:r.type==='id'?'ID karta':'Biometrik pasport',hujjatSeriya:r.doc.slice(0,2),hujjatRaqam:r.doc.slice(2),
-          jshshir:/^\d{14}$/.test(r.pin)?r.pin:'',tugilgan:r.dobIso,hujjatMuddat:r.expIso};
-        msg=r.ok?"Hujjat o'qildi: "+r.surname+' '+r.given+', '+r.doc+". Otasining ismini va manzilni qo'lda yozing.":"Hujjat o'qildi, lekin ayrim belgilar shubhali — maydonlarni tekshiring yoki qayta, aniqroq suratga oling.";
-      }else{
-        await w.setParameters({tessedit_char_whitelist:'',tessedit_pageseg_mode:'3'});
-        const {data}=await w.recognize(prepCanvas(im,'full','gray'));
-        const p=kind==='prava'?parsePrava(data.text):parseTex(data.text);
-        const ef=this.state.eForm||{};
-        if(p._fam&&!ef.familiya)p.familiya=p._fam;if(p._ism&&!ef.ism)p.ism=p._ism;delete p._fam;delete p._ism;
-        patch=p;const n=Object.keys(p).length;
-        if(!n)throw new Error('text');
-        msg=n+" ta maydon to'ldirildi. Rasmdagi yozuvdan o'qildi — iltimos, har birini tekshiring.";
+      this.camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+      if(this.camEl){this.camEl.srcObject=this.camStream;this.camEl.muted=true;try{await this.camEl.play();}catch(e){}}
+      this.setState({cam:{kind,msg:kind==='mrz'?"Hujjatni ramkaga joylang — pastdagi <<< qatorlar aniq ko'rinsin. Dastur o'zi o'qib oladi.":"Hujjatni ramkaga joylang va «Suratga olish» tugmasini bosing."}});
+      this.ocrWorker().catch(()=>{});
+      if(kind==='mrz'){this._camLoop=true;this.camLoop();}
+    }catch(err){this.stopCam();this.setState({cam:null,scanMsg:{ok:0,text:"Kamera ochilmadi ("+(err&&err.name==='NotAllowedError'?"ruxsat berilmadi":"kamera topilmadi")+"). Brauzerga kameraga ruxsat bering yoki «Rasm yuklash» tugmasidan foydalaning."}});}
+  }
+  grabFrame(){const v=this.camEl;if(!v||!v.videoWidth)return null;const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);return c;}
+  async camLoop(){
+    let tries=0;
+    while(this._camLoop&&this.state.cam){
+      const fr=this.grabFrame();
+      if(fr){tries++;
+        try{const res=await this.readDoc('mrz',fr,[['guideBottom','gray'],['guide','gray'],['guideBottom','bin']]);
+          if(res.ok&&this._camLoop){this.stopCam();this.setState({cam:null});this.applyScan(res);return;}}
+        catch(e){}
+        if(this.state.cam&&tries%3===0)this.setState({cam:{...this.state.cam,msg:"Qidirilmoqda… Hujjatni yaqinroq tuting, yaltiramasin, <<< qatorlari ramka ichida bo'lsin."}});
       }
-      Object.keys(patch).forEach(k=>{if(patch[k]==null||patch[k]==='')delete patch[k];});
-      this.setState(st=>({scanBusy:false,eForm:{...(st.eForm||blankE(st.ent)),...patch},scanMsg:{ok:1,text:msg}}));
-    }catch(err){
-      const m=err&&err.message;
-      this.setState({scanBusy:false,scanMsg:{ok:0,text:m==='nolib'?"Matnni o'qish kutubxonasi yuklanmadi. Internetni tekshiring va sahifani yangilang.":m==='mrz'?"Pastdagi <<< qatorlari topilmadi. Hujjatni tekis qo'yib, yorug' joyda, qatorlar to'liq tushadigan qilib qayta suratga oling.":"Rasmdan kerakli ma'lumot topilmadi. Aniqroq, yaqinroq suratga olib qayta urinib ko'ring yoki qo'lda kiriting."}});
+      await new Promise(r=>setTimeout(r,400));
     }
   }
+  async camShot(){
+    const kind=this.state.cam&&this.state.cam.kind;const fr=this.grabFrame();if(!fr)return;
+    this._camLoop=false;this.setState({cam:{kind,msg:"O'qilmoqda…",busy:true}});
+    try{const res=await this.readDoc(kind,fr,kind==='mrz'?[['guideBottom','gray'],['guide','gray'],['guideBottom','bin'],['full','gray'],['full','bin']]:[['guide','gray']]);
+      this.stopCam();this.setState({cam:null});this.applyScan(res);}
+    catch(err){if(kind==='mrz')this._camLoop=true;this.setState({cam:{kind,msg:this.scanErr(err)+" Qayta urinib ko'ring."}});if(kind==='mrz')this.camLoop();}
+  }
+  stopCam(){this._camLoop=false;try{(this.camStream&&this.camStream.getTracks()||[]).forEach(t=>t.stop());}catch(e){}this.camStream=null;}
   /* muharrir */
   edRefCb=el=>this.edRef(el);
   sheetRefCb=el=>{this.sheetEl=el;if(el){el.innerHTML=this.sheetHtml||'';el.__h=this.sheetHtml;}};
   componentDidUpdate(){if(this.sheetEl&&this.sheetEl.__h!==this.sheetHtml){this.sheetEl.innerHTML=this.sheetHtml||'';this.sheetEl.__h=this.sheetHtml;}}
-  componentWillUnmount(){try{document.removeEventListener('selectionchange',this._selCb);}catch(e){}}
+  componentWillUnmount(){try{document.removeEventListener('selectionchange',this._selCb);}catch(e){}this.stopCam();}
   openEditor(k){const u=this.state.tpl[k];this.edInit=u&&u.mode==='html'?u.html:DEFAULT_HTML[k];this.range=null;this.go('tpledit',{edKey:k,edMsg:null,edSize:'14'});}
   edRef(el){if(!el){this.ed=null;return;}this.ed=el;if(!el.__inited){el.__inited=true;el.innerHTML=this.edInit||'';try{document.execCommand('styleWithCSS',false,false);}catch(e){}}}
   saveRange(){try{const sel=window.getSelection();if(sel&&sel.rangeCount&&this.ed&&this.ed.contains(sel.anchorNode))this.range=sel.getRangeAt(0).cloneRange();}catch(e){}}
@@ -1694,7 +1749,7 @@ class Component extends DCLogic {
   }
   setScript(script){this.setState({script});try{localStorage.setItem(SKEY,script);}catch(e){}}
   blank(){const items=this.state.items||[];const max=items.reduce((a,c)=>Math.max(a,Number(c.raqam)||0),0);const d=today();const last=items.reduce((a,c)=>!a||(Number(c.raqam)||0)>(Number(a.raqam)||0)?c:a,null);return {raqam:String(max+1),dan:d,gacha:addMonths(d,1),h1:'',h2:'',showH2:false,izoh:'',lits:'',litsGacha:'',yonalish:last&&last.yonalish||''};}
-  go(view,extra){this.setState({view,err:'',delId:null,askDelCur:false,notifOpen:false,...extra});try{window.scrollTo(0,0);}catch(e){}}
+  go(view,extra){if(this.state.cam){this.stopCam();}this.setState({view,err:'',delId:null,askDelCur:false,notifOpen:false,cam:null,...extra});try{window.scrollTo(0,0);}catch(e){}}
   renderVals(){
     const s=this.state, items=s.items||[], mode=s.script;
     const T=x=>conv(mode,x);
@@ -1708,8 +1763,8 @@ class Component extends DCLogic {
     const ent=ENT[s.ent], elist=s.data[s.ent]||[], ef=s.eForm||blankE(s.ent);
     const setF=(k,v)=>this.setState(st=>({eForm:{...(st.eForm||blankE(st.ent)),[k]:v}}));
     const visible=ent.sections.map(sec=>sec.fields.filter(f=>!f.when||f.when(ef)));
-    const SCANL={mrz:['Pasport / ID skanerlash',"Pastdagi <<< qatorlari aniq tushsin"],prava:['Pravani skanerlash','Old tomonini suratga oling'],tex:['Tex pasportni skanerlash','Seriya va davlat raqami ko\'rinsin']};
-    const sections=ent.sections.map((sec,si)=>({n:si+1,title:T(sec.title),scan:!!sec.scan&&!s.scanBusy,scanId:'scan-'+(sec.scan||si),scanLabel:sec.scan?T(SCANL[sec.scan][0]):'',scanHint:sec.scan?T(SCANL[sec.scan][1]):'',onScan:e=>this.scanDoc(sec.scan,e),fields:visible[si].map(f=>{
+    const SCANL={mrz:['Kamera bilan o\'qish',"Pasport yoki ID karta: pastdagi <<< qatorlar o'qiladi"],prava:['Kamera bilan o\'qish','Pravaning old tomoni'],tex:['Kamera bilan o\'qish','Tex pasport: seriya va davlat raqami ko\'rinsin']};
+    const sections=ent.sections.map((sec,si)=>({n:si+1,title:T(sec.title),scan:!!sec.scan&&!s.scanBusy,scanId:'scan-'+(sec.scan||si),scanLabel:sec.scan?T(SCANL[sec.scan][0]):'',scanHint:sec.scan?T(SCANL[sec.scan][1]):'',uploadLabel:T('yoki rasm yuklash'),openCam:()=>this.openCam(sec.scan),onScan:e=>this.scanDoc(sec.scan,e),fields:visible[si].map(f=>{
       const val=ef[f.k]??'', opts=f.seg||f.opts||(f.dyn?['']:null);
       const o={id:'e-'+f.k,lid:'el-'+f.k,label:T(f.l),req:!!f.req,col:f.col||'auto',hint:f.hint?T(f.hint):'',
         isText:!opts&&!f.photo,isSelect:!!(f.opts||f.dyn),isSeg:!!f.seg,isPhoto:!!f.photo,value:val,noPhoto:!val,
@@ -1917,6 +1972,9 @@ class Component extends DCLogic {
         this.go('view',{curId:rec.id,yvMsg:{ok:1,text:"Yo'l varaqasi saqlandi. Endi uni chop etish yoki Word faylini yuklab olish mumkin."}});
       },
       c:cview,sh,vcards,htmlSheet:htmlMode,oldSheet:!htmlMode,sheetRef:this.sheetRefCb,isTplEdit:s.view==='tpledit',ed,
+      cam:{open:!!s.cam,mrz:!!(s.cam&&s.cam.kind==='mrz'),busy:!!(s.cam&&s.cam.busy),ref:this.camRefCb,msg:s.cam?T(s.cam.msg||''):'',
+        title:s.cam?T(({mrz:'Pasport / ID karta',prava:'Haydovchilik guvohnomasi (prava)',tex:'Tex pasport'})[s.cam.kind]||''):'',
+        shot:()=>this.camShot(),close:()=>{this.stopCam();this.setState({cam:null});}},
       isSettings:s.view==='settings',setCls:navView==='settings'?'on':'',
       goSettings:()=>{const c=s.cfg||{};this.go('settings',{setForm:{url:c.url||'',token:c.token||'',firm:c.firm||''},setMsg:null});},
       syncText:T(({off:"Sheets ulanmagan",loading:"Yuklanmoqda…",saving:"Saqlanmoqda…",ok:"Sheets ✓",err:"Sheets: xato",empty:"Sheets bo'sh"})[s.sync||'off']),
