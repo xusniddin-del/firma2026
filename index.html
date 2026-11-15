@@ -15,6 +15,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
 <style>
 :root{--bg:#F4F5F9;--card:#FFFFFF;--ink:#111827;--muted:#565F70;--line:#E7E9F0;--blue:#2F45E8;--blue-soft:#EEF0FE;--sky:#2563EB;--green:#15803D;--green-b:#22C55E;--purple:#9333EA;--orange:#C2410C;--orange-b:#F59E0B;--orange-l:#FDE6B3;--shadow:0 1px 2px rgba(17,24,39,.04),0 6px 24px rgba(17,24,39,.05)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
@@ -605,10 +606,20 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,
             </div>
             <button onClick="{{ e.goList }}" class="btn btn-soft">{{ e.listBtn }}</button>
           </div>
+          <sc-if value="{{ e.scanMsg }}" hint-placeholder-val="{{ false }}"><div role="status" style="border-radius:12px;padding:12px 16px;font-size:14px;font-weight:600;background:{{ e.scanBg }};color:{{ e.scanColor }}">{{ e.scanMsg }}</div></sc-if>
           <div class="card" style="padding:0;overflow:hidden">
             <sc-for list="{{ e.sections }}" as="sec" hint-placeholder-count="3">
               <section style="display:flex;flex-wrap:wrap;gap:10px 28px;padding:18px 24px;border-bottom:1px solid var(--line)">
-                <h2 style="flex:1 1 160px;max-width:200px;margin:6px 0 0;font-size:14px;font-weight:700;color:var(--ink)">{{ sec.title }}</h2>
+                <div style="flex:1 1 160px;max-width:200px;display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+                  <h2 style="margin:6px 0 0;font-size:14px;font-weight:700;color:var(--ink)">{{ sec.title }}</h2>
+                  <sc-if value="{{ sec.scan }}" hint-placeholder-val="{{ false }}">
+                    <label for="{{ sec.scanId }}" class="btn btn-soft" style="cursor:pointer;font-size:13px;font-weight:600;padding:8px 12px;gap:6px">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M7 12h10"></path></svg>
+                      {{ sec.scanLabel }}</label>
+                    <input id="{{ sec.scanId }}" type="file" accept="image/*" capture="environment" onChange="{{ sec.onScan }}" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden">
+                    <span style="font-size:11px;color:var(--muted);line-height:1.35">{{ sec.scanHint }}</span>
+                  </sc-if>
+                </div>
                 <div style="flex:999 1 420px;min-width:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px 14px;align-items:end">
                   <sc-for list="{{ sec.fields }}" as="fl" hint-placeholder-count="4">
                     <div class="field" style="grid-column:{{ fl.col }};gap:5px">
@@ -962,16 +973,19 @@ const ENT = {
         {k:'ism',l:'Ismi',req:1,ph:'Vali'},
         {k:'otasi',l:'Otasining ismi',ph:'Karimovich'},
         {k:'telefon',l:'Telefon raqami',req:1,raw:1,type:'tel',ph:'+998 90 123 45 67'}]},
-      {title:'Pasport / ID karta', fields:[
+      {title:'Pasport / ID karta', scan:'mrz', fields:[
         {k:'hujjatTuri',l:'Hujjat turi',seg:['Biometrik pasport','ID karta'],col:'1/-1'},
         {k:'hujjatSeriya',l:'Hujjat seriyasi',req:1,raw:1,up:1,ph:'AA',max:2},
         {k:'hujjatRaqam',l:'Hujjat raqami',req:1,raw:1,num:1,ph:'1234567',max:7},
-        {k:'jshshir',l:'JShShIR (PINFL)',raw:1,num:1,ph:'12345678901234',max:14,hint:'14 raqam'}]},
-      {title:'Prava', fields:[
+        {k:'jshshir',l:'JShShIR (PINFL)',raw:1,num:1,ph:'12345678901234',max:14,hint:'14 raqam'},
+        {k:'tugilgan',l:"Tug'ilgan sanasi",type:'date',raw:1},
+        {k:'hujjatMuddat',l:'Hujjat amal qilish muddati',type:'date',raw:1}]},
+      {title:'Prava', scan:'prava', fields:[
         {k:'pravaSeriya',l:'Prava seriyasi',req:1,raw:1,up:1,ph:'AF',max:3},
         {k:'pravaRaqam',l:'Prava raqami',req:1,raw:1,num:1,ph:'1234567',max:7},
-        {k:'pravaToifa',l:'Prava toifasi',raw:1,up:1,ph:'B, C'}]},
-      {title:'Avtomobil', fields:[
+        {k:'pravaToifa',l:'Prava toifasi',raw:1,up:1,ph:'B, C'},
+        {k:'pravaMuddat',l:'Prava amal qilish muddati',type:'date',raw:1}]},
+      {title:'Avtomobil', scan:'tex', fields:[
         {k:'mashina',l:'Mashina turi (rusumi)',req:1,raw:1,ph:'Chevrolet Cobalt'},
         {k:'rang',l:'Mashina rangi',req:1,ph:'Oq'},
         {k:'davlatRaqam',l:'Davlat raqami',req:1,raw:1,up:1,ph:'40 A 123 BC',max:12},
@@ -1376,6 +1390,76 @@ async function htmlToDocx(html){
   return z.generateAsync({type:'blob',mimeType:DOCX_MIME,compression:'DEFLATE'});
 }
 const errText = e => {const m=String((e&&e.message)||e);return m==='parol'?"parol noto'g'ri":m==='nourl'?"manzil kiritilmagan":m==='javob'||/Failed to fetch|NetworkError|Load failed/i.test(m)?"manzilga ulanib bo'lmadi (URL va «Hamma kira oladi» sozlamasini tekshiring)":m;};
+/* ---------- Hujjatni kamera orqali o'qish (MRZ + matn) ---------- */
+const TESS = {workerPath:'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/worker.min.js',corePath:'https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1',langPath:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng@1.0.0/4.0.0_best_int'};
+function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=u;});}
+function prepCanvas(im,part,mode){
+  const sx=0,sy=part==='bottom'?Math.round(im.height*0.55):0,sw=im.width,sh=part==='bottom'?im.height-sy:im.height;
+  const k=Math.min(3,Math.max(1,1800/sw));const c=document.createElement('canvas');c.width=Math.round(sw*k);c.height=Math.round(sh*k);
+  const g=c.getContext('2d');g.drawImage(im,sx,sy,sw,sh,0,0,c.width,c.height);
+  const d=g.getImageData(0,0,c.width,c.height),p=d.data;
+  const gray=new Float32Array(p.length/4);let mn=255,mx=0;
+  for(let i=0,j=0;i<p.length;i+=4,j++){const v=0.299*p[i]+0.587*p[i+1]+0.114*p[i+2];gray[j]=v;if(v<mn)mn=v;if(v>mx)mx=v;}
+  let th=0;if(mode==='bin'){const h=new Array(256).fill(0);gray.forEach(v=>h[v|0]++);let sum=0,sB=0,wB=0,best=0;const n=gray.length;for(let t=0;t<256;t++)sum+=t*h[t];
+    for(let t=0;t<256;t++){wB+=h[t];if(!wB)continue;const wF=n-wB;if(!wF)break;sB+=t*h[t];const mB=sB/wB,mF=(sum-sB)/wF,bt=wB*wF*(mB-mF)*(mB-mF);if(bt>best){best=bt;th=t;}}}
+  for(let i=0,j=0;i<p.length;i+=4,j++){let v=gray[j];v=mode==='bin'?(v>th?255:0):Math.max(0,Math.min(255,(v-mn)*255/Math.max(1,mx-mn)));p[i]=p[i+1]=p[i+2]=v;}
+  g.putImageData(d,0,0);return c;
+}
+const MRZ_W=[7,3,1];
+const mrzVal=ch=>ch==='<'?0:/[0-9]/.test(ch)?+ch:ch.charCodeAt(0)-55;
+const mrzCheck=(s,cd)=>{let t=0;for(let i=0;i<s.length;i++)t+=mrzVal(s[i])*MRZ_W[i%3];return String(t%10)===cd;};
+const toDig=s=>s.replace(/O|Q|D/g,'0').replace(/I|L/g,'1').replace(/Z/g,'2').replace(/S/g,'5').replace(/B/g,'8').replace(/G/g,'6');
+const toLet=s=>s.replace(/0/g,'O').replace(/1/g,'I').replace(/5/g,'S').replace(/8/g,'B').replace(/2/g,'Z');
+const mrzDate=(s,future)=>{if(!/^\d{6}$/.test(s))return '';let y=+s.slice(0,2);const cy=new Date().getFullYear()%100;y=future?2000+y:(y>cy?1900+y:2000+y);return y+'-'+s.slice(2,4)+'-'+s.slice(4,6);};
+const nameCase=s=>s.split(' ').filter(Boolean).map(w=>w.charAt(0)+w.slice(1).toLowerCase()).join(' ');
+function parseMRZ(text){
+  const lines=String(text||'').toUpperCase().replace(/[«‹(\[{]/g,'<').split(/\n/).map(l=>l.replace(/\s+/g,'').replace(/[^A-Z0-9<]/g,'')).filter(l=>l.length>=12);
+  const D='[0-9OILZSBGQD]';
+  const names=(l,strip)=>{let x=String(l||'');if(strip){const u=x.slice(0,7).indexOf('UZB');x=u>=0?x.slice(u+3):/^P</.test(x)?x.slice(5):x;}
+    const n=x.split('<<').filter(Boolean);
+    return {surname:nameCase((n[0]||'').replace(/</g,' ').replace(/[0-9]/g,'')),given:nameCase((n[1]||'').replace(/</g,' ').replace(/[0-9]/g,''))};};
+  const fin=r=>{r.doc=toLet(r.doc.slice(0,2))+toDig(r.doc.slice(2));['docCd','dob','dobCd','exp','expCd'].forEach(k=>r[k]=toDig(r[k]));r.pin=toDig(r.pin||'').replace(/[^0-9]/g,'').slice(0,14);
+    r.ok=mrzCheck(r.doc,r.docCd)&&mrzCheck(r.dob,r.dobCd)&&mrzCheck(r.exp,r.expCd);r.dobIso=mrzDate(r.dob,false);r.expIso=mrzDate(r.exp,true);return r;};
+  // ID karta (TD1): 1-qator ...UZB + hujjat raqami, 2-qator sana-jins-muddat, 3-qator ism
+  for(let i=0;i<lines.length-1;i++){
+    const a=lines[i].match(new RegExp('UZB([A-Z0-9]{2}'+D+'{7})('+D+')([0-9A-Z<]{0,15})'));
+    const b=lines[i+1].match(new RegExp('('+D+'{6})('+D+')([MF<])('+D+'{6})('+D+')'));
+    if(a&&b&&!/^P/.test(lines[i])){const nm=names(lines[i+2]||'',false);
+      return fin({type:'id',...nm,doc:a[1],docCd:a[2],pin:a[3],dob:b[1],dobCd:b[2],exp:b[4],expCd:b[5]});}
+  }
+  // Pasport (TD3): 2-qator hujjat-raqam, davlat, sana, jins, muddat, JShShIR; 1-qator ism
+  for(let i=0;i<lines.length;i++){
+    const m=lines[i].match(new RegExp('([A-Z0-9]{2}'+D+'{7})('+D+')([A-Z<]{3})('+D+'{6})('+D+')([MF<])('+D+'{6})('+D+')([0-9A-Z<]{0,14})'));
+    if(m){const nm=names(i>0?lines[i-1]:'',true);
+      return fin({type:'pasport',...nm,doc:m[1],docCd:m[2],pin:m[9],dob:m[4],dobCd:m[5],exp:m[7],expCd:m[8]});}
+  }
+  return null;
+}
+const DATE_RE=/\b(\d{2})[.\-/](\d{2})[.\-/](\d{4})\b/g;
+const isoOfDmy=m=>m[3]+'-'+m[2]+'-'+m[1];
+function parsePrava(text){
+  const t=String(text||'').toUpperCase();const out={};
+  const s=t.match(/\b([A-Z]{2})\s?(\d{7})\b/);if(s){out.pravaSeriya=s[1];out.pravaRaqam=s[2];}
+  const dates=[...t.matchAll(DATE_RE)].map(isoOfDmy).sort();if(dates.length>=2)out.pravaMuddat=dates[dates.length-1];
+  const cat=t.match(/(?:^|\n)\s*9[.,]?\s*([A-Z0-9 ,]{1,30})/);
+  if(cat){const ok=(cat[1].replace(/8/g,'B').match(/\b(A1|A|B1|BE|B|C1E|C1|CE|C|D1E|D1|DE|D|M|TM|TB)\b/g)||[]);if(ok.length)out.pravaToifa=Array.from(new Set(ok)).join(', ');}
+  const f=t.match(/(?:^|\n)\s*1[.,]\s*([A-Z'ʻ’`]{2,})/);const g=t.match(/(?:^|\n)\s*2[.,]\s*([A-Z'ʻ’`]{2,})/);
+  if(f)out._fam=nameCase(f[1]);if(g)out._ism=nameCase(g[1]);
+  return out;
+}
+const CAR_BRANDS=['CHEVROLET','DAEWOO','RAVON','LADA','VAZ','KIA','HYUNDAI','TOYOTA','BYD','CHERY','HAVAL','GEELY','NISSAN','HONDA','MERCEDES','BMW','VOLKSWAGEN','ISUZU','GAZ','MAN','FORD','JAC','DONGFENG','LEAPMOTOR','TESLA'];
+const CAR_MODELS=['COBALT','NEXIA','SPARK','GENTRA','LACETTI','MATIZ','DAMAS','LABO','MALIBU','CAPTIVA','TRACKER','ONIX','EQUINOX','TAHOE','TRAVERSE','R2','R3','R4','DAMAS','MONZA','ARRIZO','TIGGO','SONATA','ELANTRA','TUCSON','K5','SPORTAGE','CAMRY','COROLLA','SONG','HAN','CHAZOR','GAZELLE'];
+const CAR_COLORS={'OQ':'Oq','QORA':'Qora','KULRANG':'Kulrang','KUMUSH':'Kumushrang','KUMUSHRANG':'Kumushrang','QIZIL':'Qizil','KOK':"Ko'k",'HAVORANG':'Havorang','YASHIL':'Yashil','SARIQ':'Sariq','JIGARRANG':'Jigarrang','QONGIR':"Qo'ng'ir",'BEJ':'Bej','WHITE':'Oq','BLACK':'Qora','SILVER':'Kumushrang','GREY':'Kulrang','GRAY':'Kulrang','RED':'Qizil','BLUE':"Ko'k"};
+function parseTex(text){
+  const t=String(text||'').toUpperCase();const flat=t.replace(/['ʻ’`]/g,'');const out={};
+  const s=t.match(/\b([A-Z]{3})\s?(\d{7})\b/);if(s){out.texSeriya=s[1];out.texRaqam=s[2];}
+  const p1=t.match(/\b(\d{2})\s?([A-Z])\s?(\d{3})\s?([A-Z]{2})\b/),p2=t.match(/\b(\d{2})\s?(\d{3})\s?([A-Z]{3})\b/);
+  if(p1)out.davlatRaqam=p1[1]+' '+p1[2]+' '+p1[3]+' '+p1[4];else if(p2)out.davlatRaqam=p2[1]+' '+p2[2]+' '+p2[3];
+  const br=CAR_BRANDS.find(b=>new RegExp('\\b'+b+'\\b').test(t)),md=CAR_MODELS.find(m=>new RegExp('\\b'+m+'\\b').test(t));
+  if(br||md)out.mashina=nameCase([br,md].filter(Boolean).join(' '));
+  const col=Object.keys(CAR_COLORS).find(c=>new RegExp('\\b'+c+'\\b').test(flat));if(col)out.rang=CAR_COLORS[col];
+  return out;
+}
 const STAFF_SEED = [['Rahimov','Akmal','Bosh menejer','Boshqaruv'],['Karimova','Dilnoza','Sotuv menejeri','Sotuv'],['Tursunov','Sardor','Yurist','Yuridik'],['Yusupova','Malika','Hisobchi','Hisobxona']]
   .map(([f,i,l,b],n)=>({id:'x'+n,familiya:f,ism:i,otasi:'',telefon:'+998 90 55'+n+' 1'+n+' 2'+n,lavozim:l,bolim:b,kirgan:'2025-0'+(n+2)+'-01',holat:'Faol'}));
 function shrinkImage(file,cb){
@@ -1444,7 +1528,7 @@ class Component extends DCLogic {
     catch(e){this.setState({sync:'err',syncErr:String(e.message||e),setMsg:{ok:0,text:"Ulanib bo'lmadi: "+errText(e)}});}}
   markRead(keys){const readN=Array.from(new Set([...(this.state.readN||[]),...keys]));this.setState({readN});try{localStorage.setItem(NKEY,JSON.stringify(readN));}catch(e){}this.push('readN',readN);}
   persistE(ent,list){this.setState(st=>({data:{...st.data,[ent]:list}}));try{localStorage.setItem(ENT[ent].key,JSON.stringify(list));}catch(e){}this.push(ent,list);}
-  goE(ent,view){this.go(view,{ent,eq:'',flash:'',photoErr:'',eForm:view==='eform'?blankE(ent):null,eEditId:null});}
+  goE(ent,view){this.go(view,{ent,eq:'',flash:'',photoErr:'',scanMsg:null,eForm:view==='eform'?blankE(ent):null,eEditId:null});}
   goNewYV(){this.go('new',{form:this.blank(),editId:null});}
   editItem(it){this.go('new',{form:{raqam:String(it.raqam),dan:it.dan,gacha:it.gacha,h1:it.h1,h2:it.h2||'',showH2:!!it.h2,izoh:it.izoh||'',lits:it.lits||'',litsGacha:it.litsGacha||'',yonalish:it.yonalish||''},editId:it.id});}
   renew(it){let dan=addDays(it.gacha,1);if(dan<today())dan=today();const len=Math.max(1,monthsBetween(it.dan,it.gacha));
@@ -1506,6 +1590,41 @@ class Component extends DCLogic {
       this.setState({yvMsg:{ok:1,text:"PDF yuklab olindi ("+pages.length+" varaq). Faylni oching va chop eting."}});
     }catch(e){this.setState({yvMsg:{ok:0,text:"PDF tayyorlab bo'lmadi. «Word yuklab olish» tugmasidan foydalaning."}});}
     finally{try{host.remove();}catch(e){}}
+  }
+  async ocrWorker(){if(this._ocr)return this._ocr;if(!window.Tesseract)throw new Error('nolib');this._ocr=await window.Tesseract.createWorker('eng',1,TESS);return this._ocr;}
+  async scanDoc(kind,e){
+    const file=e.target.files&&e.target.files[0];try{e.target.value='';}catch(x){}
+    if(!file)return;
+    this.setState({scanBusy:true,scanMsg:{ok:2,text:"Hujjat o'qilmoqda… (birinchi marta 10–20 soniya ketishi mumkin)"}});
+    try{
+      const im=await loadImg(file);const w=await this.ocrWorker();let patch={},msg='';
+      if(kind==='mrz'){
+        let r=null;
+        await w.setParameters({tessedit_char_whitelist:'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<',tessedit_pageseg_mode:'6'});
+        for(const [part,mode] of [['bottom','gray'],['bottom','bin'],['full','gray'],['full','bin']]){
+          const {data}=await w.recognize(prepCanvas(im,part,mode));const x=parseMRZ(data.text);
+          if(x&&(!r||x.ok))r=x;if(r&&r.ok)break;
+        }
+        if(!r)throw new Error('mrz');
+        patch={familiya:r.surname,ism:r.given,hujjatTuri:r.type==='id'?'ID karta':'Biometrik pasport',hujjatSeriya:r.doc.slice(0,2),hujjatRaqam:r.doc.slice(2),
+          jshshir:/^\d{14}$/.test(r.pin)?r.pin:'',tugilgan:r.dobIso,hujjatMuddat:r.expIso};
+        msg=r.ok?"Hujjat o'qildi: "+r.surname+' '+r.given+', '+r.doc+". Otasining ismini va manzilni qo'lda yozing.":"Hujjat o'qildi, lekin ayrim belgilar shubhali — maydonlarni tekshiring yoki qayta, aniqroq suratga oling.";
+      }else{
+        await w.setParameters({tessedit_char_whitelist:'',tessedit_pageseg_mode:'3'});
+        const {data}=await w.recognize(prepCanvas(im,'full','gray'));
+        const p=kind==='prava'?parsePrava(data.text):parseTex(data.text);
+        const ef=this.state.eForm||{};
+        if(p._fam&&!ef.familiya)p.familiya=p._fam;if(p._ism&&!ef.ism)p.ism=p._ism;delete p._fam;delete p._ism;
+        patch=p;const n=Object.keys(p).length;
+        if(!n)throw new Error('text');
+        msg=n+" ta maydon to'ldirildi. Rasmdagi yozuvdan o'qildi — iltimos, har birini tekshiring.";
+      }
+      Object.keys(patch).forEach(k=>{if(patch[k]==null||patch[k]==='')delete patch[k];});
+      this.setState(st=>({scanBusy:false,eForm:{...(st.eForm||blankE(st.ent)),...patch},scanMsg:{ok:1,text:msg}}));
+    }catch(err){
+      const m=err&&err.message;
+      this.setState({scanBusy:false,scanMsg:{ok:0,text:m==='nolib'?"Matnni o'qish kutubxonasi yuklanmadi. Internetni tekshiring va sahifani yangilang.":m==='mrz'?"Pastdagi <<< qatorlari topilmadi. Hujjatni tekis qo'yib, yorug' joyda, qatorlar to'liq tushadigan qilib qayta suratga oling.":"Rasmdan kerakli ma'lumot topilmadi. Aniqroq, yaqinroq suratga olib qayta urinib ko'ring yoki qo'lda kiriting."}});
+    }
   }
   /* muharrir */
   edRefCb=el=>this.edRef(el);
@@ -1589,7 +1708,8 @@ class Component extends DCLogic {
     const ent=ENT[s.ent], elist=s.data[s.ent]||[], ef=s.eForm||blankE(s.ent);
     const setF=(k,v)=>this.setState(st=>({eForm:{...(st.eForm||blankE(st.ent)),[k]:v}}));
     const visible=ent.sections.map(sec=>sec.fields.filter(f=>!f.when||f.when(ef)));
-    const sections=ent.sections.map((sec,si)=>({n:si+1,title:T(sec.title),fields:visible[si].map(f=>{
+    const SCANL={mrz:['Pasport / ID skanerlash',"Pastdagi <<< qatorlari aniq tushsin"],prava:['Pravani skanerlash','Old tomonini suratga oling'],tex:['Tex pasportni skanerlash','Seriya va davlat raqami ko\'rinsin']};
+    const sections=ent.sections.map((sec,si)=>({n:si+1,title:T(sec.title),scan:!!sec.scan&&!s.scanBusy,scanId:'scan-'+(sec.scan||si),scanLabel:sec.scan?T(SCANL[sec.scan][0]):'',scanHint:sec.scan?T(SCANL[sec.scan][1]):'',onScan:e=>this.scanDoc(sec.scan,e),fields:visible[si].map(f=>{
       const val=ef[f.k]??'', opts=f.seg||f.opts||(f.dyn?['']:null);
       const o={id:'e-'+f.k,lid:'el-'+f.k,label:T(f.l),req:!!f.req,col:f.col||'auto',hint:f.hint?T(f.hint):'',
         isText:!opts&&!f.photo,isSelect:!!(f.opts||f.dyn),isSeg:!!f.seg,isPhoto:!!f.photo,value:val,noPhoto:!val,
@@ -1621,6 +1741,7 @@ class Component extends DCLogic {
       empty:erows.length===0,hasRows:erows.length>0,cols:ent.cols.map(T),rows:erows,
       kicker:T(s.eEditId?fio(ef)||ent.listTitle:ent.kicker),formTitle:T(s.eEditId?ent.editTitle:ent.newTitle),
       listBtn:T(ent.listTitle+' ('+elist.length+')'),sections,
+      scanMsg:s.scanMsg?T(s.scanMsg.text):'',scanBg:s.scanMsg&&s.scanMsg.ok===1?'#DCFCE7':s.scanMsg&&s.scanMsg.ok===2?'#EEF2FF':'#FFF7ED',scanColor:s.scanMsg&&s.scanMsg.ok===1?'#14532D':s.scanMsg&&s.scanMsg.ok===2?'#1E3A8A':'#9A3412',
       hasSummary:!!ent.summary,summary:ent.summary?ent.summary(elist,s.data,T).map(m=>({...m,label:T(m.label),value:T(m.value),note:T(m.note)})):[],
       goNew:()=>this.goE(s.ent,'eform'),goList:()=>this.goE(s.ent,'elist'),
       save:()=>{
