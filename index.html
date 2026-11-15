@@ -825,7 +825,7 @@ const ini = s => {s=String(s||'').trim();if(!s)return '';const m=s.match(/^(sh|c
 const fioShort = x => {if(!x)return '';const a=ini(x.ism),b=ini(x.otasi);return [x.familiya,a?(a+'.'+(b||'')):''].filter(Boolean).join(' ');};
 const SKEY = 'firma-alifbo-v1';
 const CFG_KEY = 'firma-sheets-v1';
-const DEFAULT_API = {url:'',token:'',firm:''};
+const DEFAULT_API = {url:'https://script.google.com/macros/s/AKfycby0hC_HsljZPv04H7ZQDKizrBm_Tbrt4QCGCVcCjikU5vS-dWMX0iHKVNm9eO88bJYxYw/exec',token:'',firm:''};
 const STAFF = ['Akmal Rahimov','Dilnoza Karimova','Sardor Tursunov','Malika Yusupova'];
 const NAMES = ['Aliyev Vali','"Baraka Savdo" MChJ','Qodirova Nodira','Ergashev Bobur','"Nur Qurilish" MChJ','Sobirov Jasur','Xolmatova Gulnora','"Tex Servis" XK','Rustamov Anvar','Mirzayeva Zarina','Usmonov Sherzod','"Agro Invest" MChJ','G\'ulomov Shavkat','O\'ktamova Charos'];
 const MON = ['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
