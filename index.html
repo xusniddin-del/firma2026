@@ -627,7 +627,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,
                       <label for="{{ fl.id }}" id="{{ fl.lid }}" style="font-size:12px">{{ fl.label }}<sc-if value="{{ fl.req }}" hint-placeholder-val="{{ false }}"><span style="color:#B91C1C"> *</span></sc-if><sc-if value="{{ fl.hint }}" hint-placeholder-val="{{ false }}"><span style="font-weight:400;color:var(--muted)"> · {{ fl.hint }}</span></sc-if></label>
                       <sc-if value="{{ fl.isPhoto }}" hint-placeholder-val="{{ false }}">
                         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-                          <div style="width:96px;height:96px;border-radius:50%;background:#EEF0F4;border:2px dashed #CBD0DC;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none">
+                          <div style="width:90px;height:120px;border-radius:8px;background:#EEF0F4;border:2px dashed #CBD0DC;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none">
                             <sc-if value="{{ fl.value }}" hint-placeholder-val="{{ false }}"><img src="{{ fl.value }}" alt="{{ fl.alt }}" style="width:100%;height:100%;object-fit:cover"></sc-if>
                             <sc-if value="{{ fl.noPhoto }}" hint-placeholder-val="{{ true }}"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#9AA1B1" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21a8 8 0 0 1 16 0"></path></svg></sc-if>
                           </div>
@@ -862,6 +862,18 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,
           </section>
         </div>
       </sc-if>
+      <sc-if value="{{ crop.open }}" hint-placeholder-val="{{ false }}">
+        <div role="dialog" aria-modal="true" aria-label="{{ t.cropTitle }}" style="position:fixed;inset:0;background:rgba(10,12,20,.88);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px">
+          <div style="color:#fff;font-weight:700;font-size:17px;text-align:center">{{ t.cropTitle }}</div>
+          <canvas ref="{{ crop.ref }}" width="450" height="600" style="width:min(70vw,300px);aspect-ratio:3/4;border-radius:6px;border:3px solid #fff;touch-action:none;cursor:grab;background:#000"></canvas>
+          <div style="color:#E5E7EB;font-size:13px;text-align:center;max-width:420px">{{ t.cropHint }}</div>
+          <label style="display:flex;align-items:center;gap:10px;color:#fff;font-size:13px;font-weight:600">{{ t.cropZoom }}<input type="range" min="1" max="4" step="0.02" value="{{ crop.zoom }}" onInput="{{ crop.onZoom }}" style="width:200px"></label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+            <button onClick="{{ crop.save }}" class="btn btn-blue" style="padding:12px 22px;font-size:15px">{{ t.cropSave }}</button>
+            <button onClick="{{ crop.close }}" class="btn btn-soft" style="padding:12px 22px;font-size:15px">{{ t.camClose }}</button>
+          </div>
+        </div>
+      </sc-if>
       <sc-if value="{{ cam.open }}" hint-placeholder-val="{{ false }}">
         <div role="dialog" aria-modal="true" aria-label="{{ cam.title }}" style="position:fixed;inset:0;background:rgba(10,12,20,.88);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px">
           <div style="color:#fff;font-weight:700;font-size:17px;text-align:center">{{ cam.title }}</div>
@@ -891,7 +903,7 @@ const NEWCH = /[ŞşÇçÖöĞğ]/;
 const ini = s => {s=String(s||'').trim();if(!s)return '';const m=s.match(/^(sh|ch|[og]['ʻ’‘`ʼ])/i);const x=m?m[0]:s[0];return x.charAt(0).toUpperCase()+x.slice(1).toLowerCase();};
 const fioShort = x => {if(!x)return '';const a=ini(x.ism),b=ini(x.otasi);return [x.familiya,a?(a+'.'+(b||'')):''].filter(Boolean).join(' ');};
 const SKEY = 'firma-alifbo-v1';
-const APP_VER = '2026.11.16-13.50';
+const APP_VER = '2026.11.16-14.30';
 const CFG_KEY = 'firma-sheets-v1';
 const DEFAULT_API = {url:'https://script.google.com/macros/s/AKfycby0hC_HsljZPv04H7ZQDKizrBm_Tbrt4QCGCVcCjikU5vS-dWMX0iHKVNm9eO88bJYxYw/exec',token:'',firm:''};
 const STAFF = ['Akmal Rahimov','Dilnoza Karimova','Sardor Tursunov','Malika Yusupova'];
@@ -969,7 +981,7 @@ const L = {
   edImport:"~Word~ fayldan ochish", edDefault:"Standart shakl", edUndo:"Ortga", edRedo:"Qaytarish", edBold:"Qalin", edItalic:"Qiya", edUnder:"Tagiga chizish",
   edSize:"Shrift:", edLeft:"Chapga", edCenter:"Markazga", edRight:"O'ngga", edJustify:"Ikki tomonga", edBlank:"____ chiziq", edBlankHint:"Bo'sh chiziq qo'yish",
   edTable:"Jadval:", edRowAdd:"+ qator", edRowDel:"− qator", edColAdd:"+ ustun", edColDel:"− ustun", edTableAdd:"Yangi jadval", edFields:"Maydonlar:", setNav:"Sozlamalar", mehTitle:"Mehnat shartnomasi", mehSub:"Xodimlar va haydovchilar bilan mehnat shartnomalarini tuzish",
-  mehEmpty:"Bo'lim tayyorlanmoqda", mehEmptyText:"Bu yerda mehnat shartnomalari tuziladi, saqlanadi, chop etiladi va Word'da yuklab olinadi. Qanday ishlashi kelishilgach to'ldiriladi.", mehTplBtn:"Shartnoma shablonini ochish", mehDocxNote:"Shablon Word fayl ko'rinishida yuklangan, shuning uchun bu yerda ko'rinmaydi. «Word yuklab olish» tugmasi bilan to'ldirilgan shartnomani oling.", camShot:"Suratga olish", camClose:"Yopish", camReading:"O'qilmoqda…", setTitle:"Sozlamalar", setSub:"Ma'lumotlar Google Sheets jadvalida saqlanadi — barcha kompyuterlarda bir xil ko'rinadi.",
+  mehEmpty:"Bo'lim tayyorlanmoqda", mehEmptyText:"Bu yerda mehnat shartnomalari tuziladi, saqlanadi, chop etiladi va Word'da yuklab olinadi. Qanday ishlashi kelishilgach to'ldiriladi.", mehTplBtn:"Shartnoma shablonini ochish", cropTitle:"Rasmni 3×4 ramkaga joylang", cropHint:"Rasmni barmoq yoki sichqoncha bilan suring, yuzni ramka o'rtasiga keltiring. Kattalashtirish uchun pastdagi chiziqni suring.", cropZoom:"Kattalashtirish", cropSave:"Saqlash", mehDocxNote:"Shablon Word fayl ko'rinishida yuklangan, shuning uchun bu yerda ko'rinmaydi. «Word yuklab olish» tugmasi bilan to'ldirilgan shartnomani oling.", camShot:"Suratga olish", camClose:"Yopish", camReading:"O'qilmoqda…", setTitle:"Sozlamalar", setSub:"Ma'lumotlar Google Sheets jadvalida saqlanadi — barcha kompyuterlarda bir xil ko'rinadi.",
   setUrl:"Google Apps Script veb-ilova manzili (URL)", setToken:"Parol", setTokenPh:"Apps Script'dagi PAROL", setFirm:"Firma nomi",
   setSave:"Saqlash va ulanish", setPush:"Hozirgi ma'lumotlarni Sheets'ga yuborish", setPull:"Sheets'dan qayta yuklash", setOff:"Uzish",
   setHowTitle:"Google Sheets'ni qanday ulash kerak", setCodeLink:"Apps Script kodini ochish (Code.gs) →", edPage:"+ yangi varaq"
@@ -1022,6 +1034,8 @@ const addr = x => {
   return p.join(', ');
 };
 const fio = x => [x.familiya,x.ism,x.otasi].filter(Boolean).join(' ');
+const OYLAR=['yanvar','fevral','mart','aprel','may','iyun','iyul','avgust','sentabr','oktabr','noyabr','dekabr'];
+const uzSana = s => {if(!s)return '';const [y,m,d]=s.split('-');return '“'+d+'” '+OYLAR[Number(m)-1]+' '+y;};
 const ENT = {
   drivers:{key:'firma-haydovchilar-v1', nav:'Yangi haydovchi', listTitle:'Haydovchilar', add:'+ Yangi haydovchi', newTitle:'Yangi haydovchi', editTitle:"Haydovchi ma'lumotlarini tahrirlash", kicker:"Haydovchilar bazasiga qo'shish", one:'haydovchi', openForm:true,
     searchPh:'Ism, telefon yoki davlat raqami', emptyTitle:"Hali haydovchi qo'shilmagan", emptyText:"Birinchi haydovchining ma'lumotlarini kiriting.",
@@ -1038,7 +1052,9 @@ const ENT = {
         {k:'hujjatRaqam',l:'Hujjat raqami',req:1,raw:1,num:1,ph:'1234567',max:7},
         {k:'jshshir',l:'JShShIR (PINFL)',raw:1,num:1,ph:'12345678901234',max:14,hint:'14 raqam'},
         {k:'tugilgan',l:"Tug'ilgan sanasi",type:'date',raw:1},
-        {k:'hujjatMuddat',l:'Hujjat amal qilish muddati',type:'date',raw:1}]},
+        {k:'hujjatMuddat',l:'Hujjat amal qilish muddati',type:'date',raw:1},
+        {k:'pasportBerilgan',l:'Berilgan sanasi',type:'date',raw:1,hint:'skanerda o\'zi hisoblanadi'},
+        {k:'pasportKim',l:'Kim tomonidan berilgan (tuman/shahar)',ph:"Marg'ilon shahar",hint:'bo\'sh qolsa — yashash shahri'}]},
       {title:'Prava', scan:'prava', fields:[
         {k:'pravaSeriya',l:'Prava seriyasi',req:1,raw:1,up:1,ph:'AF',max:3},
         {k:'pravaRaqam',l:'Prava raqami',req:1,raw:1,num:1,ph:'1234567',max:7},
@@ -1049,7 +1065,8 @@ const ENT = {
         {k:'rang',l:'Mashina rangi',req:1,ph:'Oq'},
         {k:'davlatRaqam',l:'Davlat raqami',req:1,raw:1,up:1,ph:'40 A 123 BC',max:12},
         {k:'texSeriya',l:'Tex pasport seriyasi',req:1,raw:1,up:1,ph:'AAF',max:3},
-        {k:'texRaqam',l:'Tex pasport raqami',req:1,raw:1,num:1,ph:'1234567',max:7}]},
+        {k:'texRaqam',l:'Tex pasport raqami',req:1,raw:1,num:1,ph:'1234567',max:7},
+        {k:'mashinaYil',l:'Ishlab chiqarilgan yili',raw:1,num:1,ph:'2025',max:4}]},
       {title:'Yashash manzili', fields:[
         {k:'shahar',l:'Shahar yoki tuman',req:1,ph:"Marg'ilon shahri"},
         {k:'mfy',l:'MFY',req:1,ph:'Mustaqillik MFY'},
@@ -1190,7 +1207,7 @@ const TAGS = [
   ['haydovchi1','Asosiy haydovchi: Familiya I.O (Sharofiddinov X.J)'],['guvohnoma1','Asosiy haydovchi guvohnomasi (prava) seriya va raqami'],['telefon1','Asosiy haydovchi telefoni'],
   ['haydovchi2',"Qo'shimcha haydovchi: Familiya I.O"],['guvohnoma2','Yordamchi haydovchi guvohnomasi (prava)'],['telefon2','Yordamchi haydovchi telefoni'],
   ['litsenziya','Litsenziya AT raqami'],['litsenziya_gacha','Litsenziya amal qilish muddati'],['yonalish',"Yo'nalish raqami"],
-  ['davlat_raqami','Mashina davlat raqami'],['sh_raqam','Mehnat shartnomasi raqami'],['sh_sana','Shartnoma sanasi'],['rahbar','Rahbar F.I.Sh.'],['xodim_fio','Xodim F.I.Sh.'],['xodim_qisqa','Xodim: Familiya I.O'],['xodim_pasport','Xodim pasporti'],['xodim_jshshir','Xodim JShShIR'],['xodim_manzil','Xodim manzili'],['xodim_tel','Xodim telefoni'],['lavozim','Lavozim'],['bolim',"Bo'lim"],['maosh','Oylik maosh'],['ish_boshlash','Ish boshlash sanasi'],['ish_tugash','Shartnoma muddati'],['sinov','Sinov muddati'],['ish_vaqti','Ish vaqti'],['mashina','Mashina rusumi'],['mashina_rangi','Mashina rangi'],['tex_pasport','Tex pasport seriya va raqami']];
+  ['davlat_raqami','Mashina davlat raqami'],['sh_raqam','Mehnat shartnomasi raqami'],['rasm','Xodim rasmi 3×4'],['sh_sana_kun','Shartnoma sanasi: kun'],['sh_sana_oy','Shartnoma sanasi: oy nomi'],['sh_sana_yil','Shartnoma sanasi: yil'],['boshlash_sana','Boshlanish: “16” noyabr 2026'],['tugash_sana','Tugash: “16” noyabr 2027'],['xodim_familiya','Xodim familiyasi'],['xodim_ism','Xodim ismi'],['xodim_otasi','Xodim otasining ismi'],['pasport_kim_bergan','Pasport kim tomonidan berilgan'],['pasport_berilgan','Pasport berilgan sana'],['mashina_yil','Mashina ishlab chiqarilgan yili'],['sh_sana','Shartnoma sanasi'],['rahbar','Rahbar F.I.Sh.'],['xodim_fio','Xodim F.I.Sh.'],['xodim_qisqa','Xodim: Familiya I.O'],['xodim_pasport','Xodim pasporti'],['xodim_jshshir','Xodim JShShIR'],['xodim_manzil','Xodim manzili'],['xodim_tel','Xodim telefoni'],['lavozim','Lavozim'],['bolim',"Bo'lim"],['maosh','Oylik maosh'],['ish_boshlash','Ish boshlash sanasi'],['ish_tugash','Shartnoma muddati'],['sinov','Sinov muddati'],['ish_vaqti','Ish vaqti'],['mashina','Mashina rusumi'],['mashina_rangi','Mashina rangi'],['tex_pasport','Tex pasport seriya va raqami']];
 const PADW = {raqam:3,sana_dan:11,sana_gacha:11,yil:2,haydovchi1:32,guvohnoma1:10,davlat_raqami:12,haydovchi2:31,guvohnoma2:8};
 /* Times New Roman harf kengliklari (1000 = 1 em) — chiziq o'rniga yozilgan matn chiziq bilan bir xil kenglikda bo'lishi uchun */
 const TNR_UP={A:722,B:667,C:667,D:722,E:611,F:556,G:722,H:722,I:333,J:389,K:722,L:611,M:889,N:722,O:722,P:556,Q:722,R:667,S:556,T:611,U:722,V:722,W:944,X:722,Y:722,Z:611};
@@ -1199,7 +1216,8 @@ const TNR_SYM={' ':250,'\u00a0':250,'.':250,',':250,'-':333,'–':500,'_':500,'(
 function tnrWidth(s){let w=0;for(const ch of String(s)){const b=ch.normalize('NFD')[0];w+=TNR_SYM[ch]??(/[0-9]/.test(b)?500:TNR_UP[b]??TNR_LO[b]??500);}return w;}
 function b64ToBuf(b){const s=atob(b);const u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;}
 function bufToB64(u){let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);}
-function padVal(k,v,uw){v=String(v??'');if(k==='yil')return v;const w=uw||PADW[k];if(!w)return v;const n=Math.max(1,Math.round((w*500*PADSCALE-tnrWidth(v))/250));const l=Math.floor(n/2);return '\u00a0'.repeat(l)+v+'\u00a0'.repeat(n-l);}
+let NOPAD=false;
+function padVal(k,v,uw){v=String(v??'');if(k==='yil'||NOPAD)return v;const w=uw||PADW[k];if(!w)return v;const n=Math.max(1,Math.round((w*500*PADSCALE-tnrWidth(v))/250));const l=Math.floor(n/2);return '\u00a0'.repeat(l)+v+'\u00a0'.repeat(n-l);}
 function fillXml(xml,vals){
   const W='http://schemas.openxmlformats.org/wordprocessingml/2006/main';
   const doc=new DOMParser().parseFromString(xml,'application/xml');
@@ -1229,11 +1247,31 @@ function bumpHead(xml){const i=xml.indexOf('<w:tbl>');const a=i<0?xml:xml.slice(
       .replace(/(<w:t(?: [^>]*)?>)( {3,})(<\/w:t>)/g,(m,o,sp,c)=>o+' '.repeat(Math.max(1,Math.floor(sp.length*0.45)))+c)
       .replace(/(<w:t(?: [^>]*)?>)(_{6,})(<\/w:t>)/g,(m,o,u,c)=>o+'_'.repeat(Math.max(4,Math.floor(u.length*0.8)))+c));})+b;}
 let PADSCALE=1;
+const RASM_MK='\u2063RASM\u2063';
+function drawingXml(rid,cx,cy){return '<w:drawing><wp:inline xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" distT="0" distB="0" distL="0" distR="0"><wp:extent cx="'+cx+'" cy="'+cy+'"/><wp:docPr id="9901" name="Rasm"/>'+
+  '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">'+
+  '<pic:nvPicPr><pic:cNvPr id="0" name="rasm.jpeg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="'+rid+'"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>'+
+  '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';}
+async function putImage(zip,xml,dataUrl,wCm){
+  const re=/(<w:t(?: [^>]*)?>)([^<]*?)\u2063RASM\u2063([^<]*)(<\/w:t>)/g;
+  if(!dataUrl||!/^data:image\/jpeg/.test(dataUrl))return xml.replace(re,'$1$2$3$4');
+  zip.file('word/media/rasm_xodim.jpeg',dataUrl.split(',')[1],{base64:true});
+  const rp='word/_rels/document.xml.rels';let rels=await zip.file(rp).async('string');
+  if(rels.indexOf('rIdRasmX')<0)rels=rels.replace('</Relationships>','<Relationship Id="rIdRasmX" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/rasm_xodim.jpeg"/></Relationships>');
+  zip.file(rp,rels);
+  let ct=await zip.file('[Content_Types].xml').async('string');
+  if(!/Extension="jpeg"/i.test(ct))ct=ct.replace('<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">','<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="jpeg" ContentType="image/jpeg"/>');
+  zip.file('[Content_Types].xml',ct);
+  const cx=Math.round((wCm||3)*360000),cy=Math.round(cx*4/3);
+  return xml.replace(re,(m,o,a,b,c)=>o+a+c+drawingXml('rIdRasmX',cx,cy)+o+b+c);
+}
 async function buildDocx(b64,vals,isDefault){
   if(!window.JSZip)throw new Error('nolib');
   const zip=await window.JSZip.loadAsync(b64ToBuf(b64));
+  const img=vals.rasm;if('rasm' in vals)vals={...vals,rasm:RASM_MK};
   const names=Object.keys(zip.files).filter(n=>/^word\/(document|header\d*|footer\d*)\.xml$/.test(n));
-  for(const n of names){let x=await zip.file(n).async('string');if(isDefault&&n==='word/document.xml')x=bumpHead(x);PADSCALE=isDefault?0.6:1;try{zip.file(n,fillXml(x,vals));}finally{PADSCALE=1;}}
+  for(const n of names){let x=await zip.file(n).async('string');if(isDefault&&n==='word/document.xml')x=bumpHead(x);PADSCALE=isDefault?0.6:1;try{x=fillXml(x,vals);}finally{PADSCALE=1;}
+    if(x.indexOf('\u2063RASM')>=0)x=n==='word/document.xml'?await putImage(zip,x,img,3):x.split(RASM_MK).join('');zip.file(n,x);}
   return zip.generateAsync({type:'blob',mimeType:DOCX_MIME,compression:'DEFLATE'});
 }
 async function findTags(b64){
@@ -1301,9 +1339,11 @@ const FLD_LABEL = {raqam:"Raqam",sana_dan:"Sana (dan)",sana_gacha:"Sana (gacha)"
   haydovchi1:"1-haydovchi F.I.Sh",guvohnoma1:"1-haydovchi prava",telefon1:"1-haydovchi tel.",haydovchi2:"2-haydovchi F.I.Sh",guvohnoma2:"2-haydovchi prava",telefon2:"2-haydovchi tel.",
   davlat_raqami:"Davlat raqami",mashina:"Mashina",mashina_rangi:"Mashina rangi",tex_pasport:"Tex pasport",sana:"Bugungi sana",firma:"Firma nomi",
   sh_raqam:"Shartnoma №",sh_sana:"Shartnoma sanasi",rahbar:"Rahbar F.I.Sh.",xodim_fio:"Xodim F.I.Sh.",xodim_qisqa:"Xodim (Familiya I.O)",xodim_pasport:"Xodim pasporti",xodim_jshshir:"Xodim JShShIR",xodim_manzil:"Xodim manzili",xodim_tel:"Xodim telefoni",xodim_tugilgan:"Tug'ilgan sana",
+  rasm:"Xodim rasmi (3×4)",sh_sana_kun:"Sana: kun",sh_sana_oy:"Sana: oy",sh_sana_yil:"Sana: yil",boshlash_sana:"Boshlanish («16» noyabr 2026)",tugash_sana:"Tugash («16» noyabr 2027)",
+  xodim_familiya:"Xodim familiyasi",xodim_ism:"Xodim ismi",xodim_otasi:"Xodim otasining ismi",pasport_kim_bergan:"Pasport kim bergan",pasport_berilgan:"Pasport berilgan sana",mashina_yil:"Mashina yili",
   lavozim:"Lavozim",bolim:"Bo'lim",maosh:"Maosh",ish_boshlash:"Ish boshlash sanasi",ish_tugash:"Shartnoma muddati",sinov:"Sinov muddati",ish_vaqti:"Ish vaqti"};
 const FLD_SETS = {yol:['raqam','sana_dan','sana_gacha','yil','yonalish','litsenziya','litsenziya_gacha','haydovchi1','guvohnoma1','telefon1','haydovchi2','guvohnoma2','telefon2','davlat_raqami','mashina','mashina_rangi','tex_pasport','sana','firma'],
-  mehnat:['sh_raqam','sh_sana','firma','rahbar','xodim_fio','xodim_qisqa','xodim_pasport','xodim_jshshir','xodim_manzil','xodim_tel','xodim_tugilgan','lavozim','bolim','maosh','ish_boshlash','ish_tugash','sinov','ish_vaqti','sana']};
+  mehnat:['rasm','sh_raqam','sh_sana','sh_sana_kun','sh_sana_oy','sh_sana_yil','boshlash_sana','tugash_sana','xodim_fio','xodim_familiya','xodim_ism','xodim_otasi','pasport_kim_bergan','pasport_berilgan','mashina_yil','mashina_rangi','mashina','davlat_raqami','firma','rahbar','xodim_qisqa','xodim_pasport','xodim_jshshir','xodim_manzil','xodim_tel','xodim_tugilgan','lavozim','bolim','maosh','ish_boshlash','ish_tugash','sinov','ish_vaqti','sana']};
 const FLD = k => '<span class="fld" data-f="'+k+'" contenteditable="false">'+FLD_LABEL[k]+'</span>';
 const GRID_HEAD = ['№','Işga çiqarilgan haydovçilarning F.I.Ş','Haydovçining imzosi','Tibbiy xodim imzosi','Tibbiy xodim muxri','Mexanik xodim muxri','Mexanik xodim imzosi','Kunlik tölov','IZOX'];
 const GRID_W = [5,22,13,10,10,11,11,9,9];
@@ -1373,6 +1413,7 @@ const htmlText = h => String(h||'').replace(/<[^>]+>/g,' ');
 function fillHtml(html,vals){
   const doc=new DOMParser().parseFromString('<div id="r">'+html+'</div>','text/html');
   doc.querySelectorAll('.fld').forEach(sp=>{const k=sp.getAttribute('data-f');const v=vals[k];
+    if(k==='rasm'){if(v&&/^data:image/.test(v)){const im=doc.createElement('img');im.src=v;im.setAttribute('style','width:3cm;height:4cm;object-fit:cover');sp.replaceWith(im);}else sp.replaceWith(doc.createTextNode(''));return;}
     const u=doc.createElement('u');u.className='val';if(!v){sp.replaceWith(doc.createTextNode(BLANK[k]||'______________'));return;}u.textContent=k==='yil'?v:'\u00a0'+v+'\u00a0';sp.replaceWith(u);});
   return doc.getElementById('r').innerHTML;
 }
@@ -1555,10 +1596,10 @@ ENT.mehnat = {key:'firma-mehnat-v1', nav:'Mehnat shartnomasi', listTitle:'Mehnat
     {title:'Ish sharoiti', fields:[
       {k:'lavozim',l:'Lavozimi',req:1,ph:'Haydovchi'},
       {k:'bolim',l:"Bo'limi",ph:'Transport'},
-      {k:'maosh',l:"Oylik maosh (so'm)",req:1,raw:1,num:1,ph:'5000000'},
+      {k:'maosh',l:"Oylik maosh (so'm)",raw:1,num:1,ph:'5000000'},
       {k:'ishVaqti',l:'Ish vaqti',ph:'09:00–18:00, 6 kunlik'},
       {k:'ishBoshlash',l:'Ishni boshlash sanasi',req:1,type:'date',raw:1,today:1},
-      {k:'muddatTuri',l:'Shartnoma muddati',seg:['Muddatsiz','Muddatli'],col:'1/-1'},
+      {k:'muddatTuri',l:'Shartnoma muddati',seg:['Muddatli','Muddatsiz'],col:'1/-1'},
       {k:'ishTugash',l:'Tugash sanasi',req:1,type:'date',raw:1,when:f=>f.muddatTuri==='Muddatli'},
       {k:'sinov',l:'Sinov muddati',opts:["Yo'q",'1 oy','2 oy','3 oy']},
       {k:'izoh',l:'Izoh',ph:"Qo'shimcha shartlar",col:'1/-1'}]}],
@@ -1574,6 +1615,13 @@ ENT.mehnat = {key:'firma-mehnat-v1', nav:'Mehnat shartnomasi', listTitle:'Mehnat
       {label:'30 kun ichida tugaydi',value:String(soon.length),note:'Muddatli shartnomalar',color:'#B45309',bar:'#F59E0B'}];}};
 const STAFF_SEED = [['Rahimov','Akmal','Bosh menejer','Boshqaruv'],['Karimova','Dilnoza','Sotuv menejeri','Sotuv'],['Tursunov','Sardor','Yurist','Yuridik'],['Yusupova','Malika','Hisobchi','Hisobxona']]
   .map(([f,i,l,b],n)=>({id:'x'+n,familiya:f,ism:i,otasi:'',telefon:'+998 90 55'+n+' 1'+n+' 2'+n,lavozim:l,bolim:b,kirgan:'2025-0'+(n+2)+'-01',holat:'Faol'}));
+function loadImage(file,S,cb){
+  const r=new FileReader();
+  r.onload=()=>{const img=new Image();img.onload=()=>{const k=Math.min(1,S/Math.max(img.width,img.height));
+    const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(null,c.toDataURL('image/jpeg',0.9));};img.onerror=()=>cb('bad');img.src=r.result;};
+  r.onerror=()=>cb('bad');r.readAsDataURL(file);
+}
 function shrinkImage(file,cb){
   const r=new FileReader();
   r.onload=()=>{const img=new Image();img.onload=()=>{
@@ -1640,7 +1688,7 @@ class Component extends DCLogic {
     catch(e){this.setState({sync:'err',syncErr:String(e.message||e),setMsg:{ok:0,text:"Ulanib bo'lmadi: "+errText(e)}});}}
   markRead(keys){const readN=Array.from(new Set([...(this.state.readN||[]),...keys]));this.setState({readN});try{localStorage.setItem(NKEY,JSON.stringify(readN));}catch(e){}this.push('readN',readN);}
   persistE(ent,list){this.setState(st=>({data:{...st.data,[ent]:list}}));try{localStorage.setItem(ENT[ent].key,JSON.stringify(list));}catch(e){}this.push(ent,list);}
-  goE(ent,view){let bf=null;if(view==='eform'){bf=blankE(ent);if(ENT[ent].autoNo){const L=this.state.data[ent]||[];bf.raqam=String(L.reduce((a,c)=>Math.max(a,Number(c.raqam)||0),0)+1);const last=L[0];if(last&&last.rahbar)bf.rahbar=last.rahbar;}}
+  goE(ent,view){let bf=null;if(view==='eform'){bf=blankE(ent);if(ENT[ent].autoNo){const L=this.state.data[ent]||[];bf.raqam=String(L.reduce((a,c)=>Math.max(a,Number(c.raqam)||0),0)+1);const last=L[0];if(last&&last.rahbar)bf.rahbar=last.rahbar;if(ent==='mehnat'){bf.lavozim='Haydovchi';bf.ishTugash=addMonths(today(),12);}}}
     this.go(view,{ent,eq:'',flash:'',photoErr:'',scanMsg:null,eForm:bf,eEditId:null});}
   goNewYV(){this.go('new',{form:this.blank(),editId:null});}
   editItem(it){this.go('new',{form:{raqam:String(it.raqam),dan:it.dan,gacha:it.gacha,h1:it.h1,h2:it.h2||'',showH2:!!it.h2,izoh:it.izoh||'',lits:it.lits||'',litsGacha:it.litsGacha||'',yonalish:it.yonalish||''},editId:it.id});}
@@ -1662,15 +1710,20 @@ class Component extends DCLogic {
     const d=this.state.data,list=c.kimTuri==='Ichki xodim'?(d.staff||[]):(d.drivers||[]);const p=list.find(x=>x.id===c.xodimId)||c.xodimSnap||{};
     const j=(...x)=>x.filter(Boolean).join(' ');
     return {sh_raqam:String(c.raqam||''),sh_sana:fd(c.sana),sana:fd(today()),firma:this.props.firmName??'Firma',rahbar:c.rahbar||'',
-      xodim_fio:fio(p),xodim_qisqa:fioShort(p),xodim_pasport:j(p.hujjatSeriya,p.hujjatRaqam),xodim_jshshir:p.jshshir||'',xodim_manzil:[p.shahar,addr(p)].filter(Boolean).join(', '),
+      xodim_fio:fio(p),xodim_qisqa:fioShort(p),xodim_pasport:j(p.hujjatSeriya,p.hujjatRaqam),xodim_jshshir:p.jshshir||'',xodim_manzil:addr(p).replace(/, /g,' '),
       xodim_tel:p.telefon||'',xodim_tugilgan:fd(p.tugilgan),lavozim:c.lavozim||'',bolim:c.bolim||'',maosh:c.maosh?fmt(c.maosh):'',ishVaqti:c.ishVaqti||'',ish_vaqti:c.ishVaqti||'',
-      ish_boshlash:fd(c.ishBoshlash),ish_tugash:c.muddatTuri==='Muddatli'?fd(c.ishTugash)+' gacha':'muddatsiz',sinov:c.sinov&&c.sinov!=="Yo'q"?c.sinov:"belgilanmagan"};
+      ish_boshlash:fd(c.ishBoshlash),ish_tugash:c.muddatTuri==='Muddatli'?fd(c.ishTugash)+' gacha':'muddatsiz',sinov:c.sinov&&c.sinov!=="Yo'q"?c.sinov:"belgilanmagan",
+      rasm:p.rasm||'',sh_sana_kun:(c.sana||'').slice(8,10),sh_sana_oy:c.sana?OYLAR[Number(c.sana.slice(5,7))-1]:'',sh_sana_yil:(c.sana||'').slice(0,4),
+      boshlash_sana:uzSana(c.ishBoshlash),tugash_sana:c.muddatTuri==='Muddatli'?uzSana(c.ishTugash):'',xodim_familiya:p.familiya||'',xodim_ism:p.ism||'',xodim_otasi:p.otasi||'',
+      pasport_kim_bergan:p.pasportKim||p.shahar||'',pasport_berilgan:fd(p.pasportBerilgan),mashina_yil:p.mashinaYil||'',mashina_rangi:p.rang||'',mashina:p.mashina||'',davlat_raqami:p.davlatRaqam||'',xodim_manzil_toliq:[p.shahar,addr(p)].filter(Boolean).join(', ')};
   }
+  newVals(v){const K=['xodim_pasport','davlat_raqami','mashina','xodim_tel','rasm','xodim_jshshir','sh_raqam','firma','rahbar'];const o={};Object.keys(v).forEach(k=>{o[k]=K.indexOf(k)<0&&typeof v[k]==='string'?toNew(v[k]):v[k];});return o;}
   async makeMehnat(c){
-    const tp=this.state.tpl.mehnat,vals=this.valsMehnat(c),name='mehnat-shartnoma-'+(c.raqam||'');
+    const tp=this.state.tpl.mehnat,name='mehnat-shartnoma-'+(c.raqam||'');let vals=this.valsMehnat(c);
     try{
+      const isNew=!tp||tp.mode==='html'?NEWCH.test(htmlText((tp&&tp.html)||DEFAULT_HTML.mehnat)):NEWCH.test(await docText(tp.b64));if(isNew)vals=this.newVals(vals);
       if(!tp||tp.mode==='html'){saveBlob(await htmlToDocx(fillHtml((tp&&tp.html)||DEFAULT_HTML.mehnat,vals)),name+'.docx');}
-      else{saveBlob(await buildDocx(tp.b64,vals,false),name+'.docx');}
+      else{NOPAD=true;try{saveBlob(await buildDocx(tp.b64,vals,false),name+'.docx');}finally{NOPAD=false;}}
       this.setState({yvMsg:{ok:1,text:"Word fayl yuklab olindi: "+name+".docx"}});
     }catch(e){this.setState({yvMsg:{ok:0,text:e&&e.message==='nolib'?"Word bilan ishlash kutubxonasi yuklanmadi. Sahifani yangilang.":"Shartnomani tuzib bo'lmadi. Bilim bazasidagi shablonni tekshiring."}});}
   }
@@ -1732,7 +1785,7 @@ class Component extends DCLogic {
       }
       if(!r)throw new Error('mrz');
       return {ok:r.ok,patch:{familiya:r.surname,ism:r.given,hujjatTuri:r.type==='id'?'ID karta':'Biometrik pasport',hujjatSeriya:r.doc.slice(0,2),hujjatRaqam:r.doc.slice(2),
-          jshshir:/^\d{14}$/.test(r.pin)?r.pin:'',tugilgan:r.dobIso,hujjatMuddat:r.expIso},
+          jshshir:/^\d{14}$/.test(r.pin)?r.pin:'',tugilgan:r.dobIso,hujjatMuddat:r.expIso,...(r.expIso?{pasportBerilgan:addDays(addMonths(r.expIso,-120),1)}:{})},
         msg:r.ok?"Hujjat o'qildi: "+r.surname+' '+r.given+', '+r.doc+". Otasining ismini va manzilni qo'lda yozing.":"Hujjat o'qildi, lekin ayrim belgilar shubhali — maydonlarni tekshiring yoki qayta, aniqroq suratga oling."};
     }
     await w.setParameters({tessedit_char_whitelist:'',tessedit_pageseg_mode:'3'});
@@ -1755,6 +1808,24 @@ class Component extends DCLogic {
     catch(err){this.setState({scanBusy:false,scanMsg:{ok:0,text:this.scanErr(err)}});}
   }
   /* jonli kamera */
+  openCrop(k,url){const img=new Image();img.onload=()=>{
+      /* telefondagi tik rasm: yuz odatda yuqori qismda — boshlang'ich holat shunga mos */
+      this._cr={img,zoom:1,cx:img.width/2,cy:img.height*(img.height>img.width*1.2?0.38:0.5)};this.setState({crop:{k},photoErr:''});this.drawCrop();};img.src=url;}
+  cropGeo(W,H){const c=this._cr,im=c.img;const sc=Math.max(W/im.width,H/im.height)*c.zoom;const hw=W/2/sc,hh=H/2/sc;
+    c.cx=Math.min(Math.max(c.cx,hw),im.width-hw);c.cy=Math.min(Math.max(c.cy,hh),im.height-hh);return {sc,x:c.cx-hw,y:c.cy-hh,w:W/sc,h:H/sc};}
+  drawCrop(){const cv=this.cropEl,c=this._cr;if(!cv||!c)return;const g=this.cropGeo(cv.width,cv.height);const x=cv.getContext('2d');
+    x.fillStyle='#000';x.fillRect(0,0,cv.width,cv.height);x.drawImage(c.img,g.x,g.y,g.w,g.h,0,0,cv.width,cv.height);
+    x.strokeStyle='rgba(255,255,255,.55)';x.lineWidth=1;x.setLineDash([5,5]);x.beginPath();x.ellipse(cv.width/2,cv.height*0.42,cv.width*0.3,cv.height*0.28,0,0,Math.PI*2);x.stroke();x.setLineDash([]);}
+  cropRefCb=el=>{this.cropEl=el;if(!el||el._bound){this.drawCrop();return;}el._bound=1;let d=null;
+    el.addEventListener('pointerdown',e=>{d={x:e.clientX,y:e.clientY};el.setPointerCapture(e.pointerId);});
+    el.addEventListener('pointermove',e=>{if(!d||!this._cr)return;const g=this.cropGeo(el.width,el.height),k=el.width/el.getBoundingClientRect().width;
+      this._cr.cx-=(e.clientX-d.x)*k/g.sc;this._cr.cy-=(e.clientY-d.y)*k/g.sc;d={x:e.clientX,y:e.clientY};this.drawCrop();});
+    const up=()=>{d=null;};el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up);
+    el.addEventListener('wheel',e=>{e.preventDefault();if(!this._cr)return;this._cr.zoom=Math.min(4,Math.max(1,this._cr.zoom*(e.deltaY<0?1.08:0.93)));this.setState({cropZoom:this._cr.zoom});this.drawCrop();},{passive:false});
+    this.drawCrop();};
+  saveCrop(){const c=this._cr,k=this.state.crop&&this.state.crop.k;if(!c||!k)return;const W=300,H=400,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    const g=this.cropGeo(W,H);cv.getContext('2d').drawImage(c.img,g.x,g.y,g.w,g.h,0,0,W,H);let q=0.85,url=cv.toDataURL('image/jpeg',q);while(url.length>45000&&q>0.4){q-=0.1;url=cv.toDataURL('image/jpeg',q);}
+    this._cr=null;this.setState(st=>({crop:null,eForm:{...(st.eForm||blankE(st.ent)),[k]:url}}));}
   camRefCb=el=>{this.camEl=el;if(el&&this.camStream&&el.srcObject!==this.camStream){el.srcObject=this.camStream;el.muted=true;el.setAttribute('playsinline','');try{el.play();}catch(e){}}};
   async openCam(kind){
     if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){this.setState({scanMsg:{ok:0,text:"Bu brauzerda kamera ishlamaydi. «Rasm yuklash» tugmasidan foydalaning."}});return;}
@@ -1877,14 +1948,14 @@ class Component extends DCLogic {
       const o={id:'e-'+f.k,lid:'el-'+f.k,label:T(f.l),req:!!f.req,col:f.col||'auto',hint:f.hint?T(f.hint):'',
         isText:!opts&&!f.photo,isSelect:!!(f.opts||f.dyn),isSeg:!!f.seg,isPhoto:!!f.photo,value:val,noPhoto:!val,
         alt:T('Haydovchi rasmi'),pickLabel:T(val?'Rasmni almashtirish':'Rasm yuklash'),clearLabel:T("O'chirish"),
-        photoHint:T('JPG yoki PNG, telefon kamerasidan ham olish mumkin'),photoErr:s.photoErr,
+        photoHint:T('Telefon rasmi ham bo\'ladi — yuklangach 3×4 qilib qirqasiz'),photoErr:s.photoErr,
         clear:()=>setF(f.k,''),inputType:f.type||'text',
         ph:f.raw?(f.ph||''):T(f.ph||''),style:f.up?'text-transform:uppercase':'',
         mode:f.num?'numeric':f.type==='tel'?'tel':f.type==='email'?'email':'text',max:f.max||200,
         on:e=>{
           if(f.photo){const file=e.target.files&&e.target.files[0];e.target.value='';if(!file)return;
             if(!/^image\//.test(file.type)){this.setState({photoErr:T('Faqat rasm fayli yuklanadi.')});return;}
-            shrinkImage(file,(err,url)=>{if(err){this.setState({photoErr:T("Rasmni o'qib bo'lmadi.")});return;}this.setState({photoErr:''});setF(f.k,url);});return;}
+            loadImage(file,1600,(err,url)=>{if(err){this.setState({photoErr:T("Rasmni o'qib bo'lmadi.")});return;}this.openCrop(f.k,url);});return;}
           let v=e.target.value;if(f.up)v=v.toUpperCase();if(f.num)v=v.replace(/\D/g,'');setF(f.k,v);}};
       if(f.dyn){const names=f.dyn(ef,s.data).filter(Boolean);
         o.options=[{v:'',l:T(names.length?'— tanlang —':f.emptyOpt(ef))},...names.map(x=>typeof x==='object'?{v:x.v,l:T(x.l)}:{v:x,l:T(x)})];}
@@ -2023,7 +2094,7 @@ class Component extends DCLogic {
     this.sheetHtml='';
     if(cur&&htmlMode){const h=(ytp&&ytp.html)||DEFAULT_HTML.yol;this.sheetHtml=fillHtml(h,this.valsFor(cur,NEWCH.test(htmlText(h))));}
     const mdoc=s.view==='edoc'?(s.data.mehnat||[]).find(x=>x.id===s.edocId):null, mtp=s.tpl.mehnat, mHtml=!mtp||mtp.mode==='html';
-    if(mdoc&&mHtml)this.sheetHtml=fillHtml((mtp&&mtp.html)||DEFAULT_HTML.mehnat,this.valsMehnat(mdoc));
+    if(mdoc&&mHtml){const mh=(mtp&&mtp.html)||DEFAULT_HTML.mehnat,mv=this.valsMehnat(mdoc);this.sheetHtml=fillHtml(mh,NEWCH.test(htmlText(mh))?this.newVals(mv):mv);}
     const dc=mdoc?{title:T('Mehnat shartnomasi № '+(mdoc.raqam||'')),sub:T((mdoc.xodimNomi||'')+' · '+(mdoc.lavozim||'')),preview:mHtml,noPreview:!mHtml,
       print:()=>this.printSheet('mehnat-shartnoma-'+(mdoc.raqam||'')),word:()=>this.makeMehnat(mdoc),
       edit:()=>this.go('eform',{ent:'mehnat',eForm:{...blankE('mehnat'),...mdoc},eEditId:mdoc.id,flash:''}),back:()=>this.goE('mehnat','elist')}:{};
@@ -2090,6 +2161,8 @@ class Component extends DCLogic {
       cam:{open:!!s.cam,mrz:!!(s.cam&&s.cam.kind==='mrz'),busy:!!(s.cam&&s.cam.busy),ref:this.camRefCb,msg:s.cam?T(s.cam.msg||''):'',
         title:s.cam?T(({mrz:'Pasport / ID karta',prava:'Haydovchilik guvohnomasi (prava)',tex:'Tex pasport'})[s.cam.kind]||''):'',
         shot:()=>this.camShot(),close:()=>{this.stopCam();this.setState({cam:null});}},
+      crop:{open:!!s.crop,ref:this.cropRefCb,zoom:String(this._cr?this._cr.zoom:1),onZoom:e=>{if(!this._cr)return;this._cr.zoom=Number(e.target.value);this.setState({cropZoom:this._cr.zoom});this.drawCrop();},
+        save:()=>this.saveCrop(),close:()=>{this._cr=null;this.setState({crop:null});}},
       appVer:'v'+APP_VER,
       isSettings:s.view==='settings',setCls:navView==='settings'?'on':'',
       goSettings:()=>{const c=s.cfg||{};this.go('settings',{setForm:{url:c.url||'',token:c.token||'',firm:c.firm||''},setMsg:null});},
