@@ -906,7 +906,7 @@ const NEWCH = /[ŞşÇçÖöĞğ]/;
 const ini = s => {s=String(s||'').trim();if(!s)return '';const m=s.match(/^(sh|ch|[og]['ʻ’‘`ʼ])/i);const x=m?m[0]:s[0];return x.charAt(0).toUpperCase()+x.slice(1).toLowerCase();};
 const fioShort = x => {if(!x)return '';const a=ini(x.ism),b=ini(x.otasi);return [capW(x.familiya),a?(a+'.'+(b||'')):''].filter(Boolean).join(' ');};
 const SKEY = 'firma-alifbo-v1';
-const APP_VER = '2026.11.16-15.30';
+const APP_VER = '2026.11.16-15.45';
 const CFG_KEY = 'firma-sheets-v1';
 const DEFAULT_API = {url:'https://script.google.com/macros/s/AKfycby0hC_HsljZPv04H7ZQDKizrBm_Tbrt4QCGCVcCjikU5vS-dWMX0iHKVNm9eO88bJYxYw/exec',token:'',firm:''};
 const STAFF = ['Akmal Rahimov','Dilnoza Karimova','Sardor Tursunov','Malika Yusupova'];
@@ -1259,6 +1259,19 @@ function drawingXml(rid,cx,cy){return '<w:drawing><wp:inline xmlns:wp="http://sc
   '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">'+
   '<pic:nvPicPr><pic:cNvPr id="0" name="rasm.jpeg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="'+rid+'"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>'+
   '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="'+cx+'" cy="'+cy+'"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';}
+/* docx-preview sahifalarga bo'lmaydi — A4 balandligi bo'yicha paragraflarni sahifalarga taqsimlaymiz */
+function paginateDocx(box){
+  Array.from(box.querySelectorAll('section.docx')).forEach(sec=>{
+    const art=sec.querySelector('article');if(!art)return;const cs=getComputedStyle(sec);
+    const pageH=sec.getBoundingClientRect().width*297/210, avail=pageH-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom)-2;
+    if(art.getBoundingClientRect().height<=avail)return;
+    const kids=Array.from(art.childNodes);let curSec=sec,curArt=art;art.innerHTML='';
+    kids.forEach(k=>{curArt.appendChild(k);
+      if(curArt.getBoundingClientRect().height>avail&&curArt.childNodes.length>1){curArt.removeChild(k);
+        const ns=sec.cloneNode(false),na=art.cloneNode(false);ns.appendChild(na);curSec.after(ns);curSec=ns;curArt=na;curArt.appendChild(k);}});
+  });
+  box.querySelectorAll('section.docx').forEach(x=>{x.style.height=x.style.minHeight||'841.9pt';x.style.overflow='hidden';});
+}
 async function swapAltImage(zip,xml,dataUrl){
   const m=xml.match(/<w:drawing>(?:(?!<\/w:drawing>)[\s\S])*?descr="\{rasm\}"(?:(?!<\/w:drawing>)[\s\S])*?<\/w:drawing>/);if(!m)return;
   const e=m[0].match(/r:embed="([^"]+)"/);if(!e||!dataUrl||!/^data:image\/jpeg/.test(dataUrl))return;
@@ -1723,9 +1736,9 @@ class Component extends DCLogic {
   async mehPreview(c,tp,pk){
     try{if(!window.mammoth||!window.JSZip)return;let vals=this.blanks(this.valsMehnat(c));if(tp.newAlpha!==false&&NEWCH.test(await docText(tp.b64)))vals=this.newVals(vals);
       NOPAD=true;let blob;try{blob=await buildDocx(tp.b64,vals,false);}finally{NOPAD=false;}
-      if(window.docx&&window.docx.renderAsync){const box=document.createElement('div');
-        await window.docx.renderAsync(blob,box,null,{inWrapper:false,ignoreWidth:false,ignoreHeight:false,breakPages:true,ignoreLastRenderedPageBreak:true,useBase64URL:true,experimental:true,renderHeaders:true,renderFooters:true});
-        if(this._mpk!==pk)return;this._mprev='<div class="mehdx">'+box.innerHTML+'</div>';this.forceUpdate();return;}
+      if(window.docx&&window.docx.renderAsync){const box=document.createElement('div');box.className='mehdx';box.style.cssText='position:absolute;left:-30000px;top:0;';document.body.appendChild(box);
+        try{await window.docx.renderAsync(blob,box,null,{inWrapper:false,ignoreWidth:false,ignoreHeight:false,breakPages:true,ignoreLastRenderedPageBreak:true,useBase64URL:true,experimental:true,renderHeaders:false,renderFooters:false});
+          paginateDocx(box);if(this._mpk!==pk)return;this._mprev='<div class="mehdx">'+box.innerHTML+'</div>';}finally{box.remove();}this.forceUpdate();return;}
       const res=await window.mammoth.convertToHtml({arrayBuffer:await blob.arrayBuffer()},{styleMap:['u => u']});if(this._mpk!==pk)return;
       this._mprev='<div class="mehprev">'+res.value.replace(/<img /,'<img style="float:right;width:3cm;height:4cm;object-fit:cover;margin:0 0 6px 12px" ')+'</div>';this.forceUpdate();}catch(e){}
   }
