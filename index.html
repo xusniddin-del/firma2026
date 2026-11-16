@@ -871,7 +871,7 @@ const NEWCH = /[ŞşÇçÖöĞğ]/;
 const ini = s => {s=String(s||'').trim();if(!s)return '';const m=s.match(/^(sh|ch|[og]['ʻ’‘`ʼ])/i);const x=m?m[0]:s[0];return x.charAt(0).toUpperCase()+x.slice(1).toLowerCase();};
 const fioShort = x => {if(!x)return '';const a=ini(x.ism),b=ini(x.otasi);return [x.familiya,a?(a+'.'+(b||'')):''].filter(Boolean).join(' ');};
 const SKEY = 'firma-alifbo-v1';
-const APP_VER = '2026.11.16-13.25';
+const APP_VER = '2026.11.16-13.30';
 const CFG_KEY = 'firma-sheets-v1';
 const DEFAULT_API = {url:'https://script.google.com/macros/s/AKfycby0hC_HsljZPv04H7ZQDKizrBm_Tbrt4QCGCVcCjikU5vS-dWMX0iHKVNm9eO88bJYxYw/exec',token:'',firm:''};
 const STAFF = ['Akmal Rahimov','Dilnoza Karimova','Sardor Tursunov','Malika Yusupova'];
@@ -1829,7 +1829,7 @@ class Component extends DCLogic {
         this.go('elist',{eq:'',eForm:null,eEditId:null,flash:T(s.eEditId?"O'zgarishlar saqlandi.":ent.newTitle+" saqlandi.")});
       }
     };
-    const nav2=['drivers','staff','mehnat','firms','kb'].map(k=>{
+    const nav2=['drivers','staff','firms','kb'].map(k=>{
       const on=navView===k;const n=(k==='kb'||k==='mehnat')?0:(s.data[k]||[]).length;
       return {label:T(k==='kb'?'Bilim bazasi':k==='mehnat'?'Mehnat shartnomasi':ENT[k].nav),icon:ICON[k],cls:on?'on':'',badge:n?String(n):'',badgeBg:on?'rgba(255,255,255,.22)':'#EEF0F4',
         go:()=>k==='kb'?this.go('kb'):k==='mehnat'?this.go('mehnat'):this.goE(k,ENT[k].openForm?'eform':'elist')};});
@@ -1946,7 +1946,7 @@ class Component extends DCLogic {
         cols:['№','Ishga chiqarilgan haydovchilarning F.I.Sh','Haydovchining imzosi','Tibbiy xodim imzosi','Tibbiy xodim muxri','Mexanik xodim muxri','Mexanik xodim imzosi',"Kunlik to'lov",'IZOH'].map(SX),
         rows:Array.from({length:30},(_,i)=>String(i+1))};
       vcards=[{title:t.h1,card:cardOf(a)},...(b?[{title:t.h2,card:cardOf(b)}]:[])];}
-    const navDef=[['dash',t.dash],['list',t.list],['new',T(L.newNav)]];
+    const navDef=[['dash',t.dash],['list',t.list],['mehnat',t.mehTitle]];
     const scripts=[['lat','Lotin',"Lotin alifbosi (oʻ, gʻ, sh, ch)"],['cyr','Кирилл','Кирилл алифбоси'],['new','Yangi',"Yangi alifbo (ö, ğ, ş, ç)"]].map(([k,l,h])=>({label:l,hint:h,cls:s.script===k?'on':'',pressed:s.script===k?'true':'false',pick:()=>this.setScript(k)}));
     const alert=ar.length||tg.length?T((ar.length?ar.length+" ta yo'l varaqasining muddati 7 kun ichida tugaydi. ":'')+(tg.length?tg.length+" tasining muddati tugagan.":'')):'';
     return {
