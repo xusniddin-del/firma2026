@@ -583,7 +583,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,
                           <sc-if value="{{ c.ini }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="width:40px;height:40px;border-radius:50%;background:#E8EDFF;color:#1E3A8A;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none">{{ c.ini }}</span></sc-if>
                           <div><div style="color:{{ c.color }}">{{ c.v }}</div><sc-if value="{{ c.sub }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:var(--muted);font-weight:400;margin-top:2px">{{ c.sub }}</div></sc-if></div></div></td></sc-for>
                         <td style="text-align:right">
-                          <sc-if value="{{ r.normal }}" hint-placeholder-val="{{ true }}"><button onClick="{{ r.edit }}" class="btn btn-ghost" style="padding:6px 10px">{{ t.edit }}</button><button onClick="{{ r.del }}" class="btn btn-danger" style="padding:6px 10px">{{ t.del }}</button></sc-if>
+                          <sc-if value="{{ r.normal }}" hint-placeholder-val="{{ true }}"><sc-if value="{{ r.hasDoc }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.view }}" class="btn btn-soft" style="padding:6px 10px">{{ t.open }}</button></sc-if><button onClick="{{ r.edit }}" class="btn btn-ghost" style="padding:6px 10px">{{ t.edit }}</button><button onClick="{{ r.del }}" class="btn btn-danger" style="padding:6px 10px">{{ t.del }}</button></sc-if>
                           <sc-if value="{{ r.asking }}" hint-placeholder-val="{{ false }}"><span role="alert" style="display:inline-flex;align-items:center;gap:6px;background:#FEF2F2;border-radius:10px;padding:4px 4px 4px 12px"><span style="font-size:13px;font-weight:600;color:#991B1B">{{ t.askDel }}</span><button onClick="{{ r.yes }}" class="btn" style="padding:6px 12px;background:#DC2626;color:#fff">{{ t.yes }}</button><button onClick="{{ r.no }}" class="btn btn-ghost" style="padding:6px 10px">{{ t.no }}</button></span></sc-if>
                         </td>
                       </tr>
@@ -767,6 +767,26 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,
         </div>
       </sc-if>
 
+      <!-- HUJJAT (mehnat shartnomasi) -->
+      <sc-if value="{{ isEdoc }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div data-noprint="1" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button onClick="{{ dc.back }}" class="btn btn-soft">{{ t.back }}</button>
+            <button onClick="{{ dc.print }}" class="btn btn-blue">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6M7 17H4v-7h16v7h-3M7 14h10v7H7z"></path></svg>
+              {{ t.print }}</button>
+            <button onClick="{{ dc.word }}" class="btn btn-dark">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>
+              {{ t.wordBtn }}</button>
+            <button onClick="{{ dc.edit }}" class="btn btn-soft">{{ t.edit }}</button>
+          </div>
+          <div data-noprint="1"><h1 style="margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em">{{ dc.title }}</h1><div class="sub" style="font-size:13px">{{ dc.sub }}</div></div>
+          <sc-if value="{{ yvMsg }}" hint-placeholder-val="{{ false }}"><div data-noprint="1" role="status" style="font-size:14px;font-weight:600;border-radius:12px;padding:10px 14px;max-width:900px;background:{{ yvMsgBg }};color:{{ yvMsgColor }}">{{ yvMsg }}</div></sc-if>
+          <sc-if value="{{ dc.preview }}" hint-placeholder-val="{{ true }}"><div ref="{{ sheetRef }}" class="a4 sheetdoc"></div></sc-if>
+          <sc-if value="{{ dc.noPreview }}" hint-placeholder-val="{{ false }}"><div class="card" style="max-width:900px;font-size:14px;color:var(--muted)">{{ t.mehDocxNote }}</div></sc-if>
+        </div>
+      </sc-if>
+
       <!-- MEHNAT SHARTNOMASI -->
       <sc-if value="{{ isMehnat }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;gap:20px">
@@ -871,7 +891,7 @@ const NEWCH = /[ŞşÇçÖöĞğ]/;
 const ini = s => {s=String(s||'').trim();if(!s)return '';const m=s.match(/^(sh|ch|[og]['ʻ’‘`ʼ])/i);const x=m?m[0]:s[0];return x.charAt(0).toUpperCase()+x.slice(1).toLowerCase();};
 const fioShort = x => {if(!x)return '';const a=ini(x.ism),b=ini(x.otasi);return [x.familiya,a?(a+'.'+(b||'')):''].filter(Boolean).join(' ');};
 const SKEY = 'firma-alifbo-v1';
-const APP_VER = '2026.11.16-13.30';
+const APP_VER = '2026.11.16-13.50';
 const CFG_KEY = 'firma-sheets-v1';
 const DEFAULT_API = {url:'https://script.google.com/macros/s/AKfycby0hC_HsljZPv04H7ZQDKizrBm_Tbrt4QCGCVcCjikU5vS-dWMX0iHKVNm9eO88bJYxYw/exec',token:'',firm:''};
 const STAFF = ['Akmal Rahimov','Dilnoza Karimova','Sardor Tursunov','Malika Yusupova'];
@@ -949,7 +969,7 @@ const L = {
   edImport:"~Word~ fayldan ochish", edDefault:"Standart shakl", edUndo:"Ortga", edRedo:"Qaytarish", edBold:"Qalin", edItalic:"Qiya", edUnder:"Tagiga chizish",
   edSize:"Shrift:", edLeft:"Chapga", edCenter:"Markazga", edRight:"O'ngga", edJustify:"Ikki tomonga", edBlank:"____ chiziq", edBlankHint:"Bo'sh chiziq qo'yish",
   edTable:"Jadval:", edRowAdd:"+ qator", edRowDel:"− qator", edColAdd:"+ ustun", edColDel:"− ustun", edTableAdd:"Yangi jadval", edFields:"Maydonlar:", setNav:"Sozlamalar", mehTitle:"Mehnat shartnomasi", mehSub:"Xodimlar va haydovchilar bilan mehnat shartnomalarini tuzish",
-  mehEmpty:"Bo'lim tayyorlanmoqda", mehEmptyText:"Bu yerda mehnat shartnomalari tuziladi, saqlanadi, chop etiladi va Word'da yuklab olinadi. Qanday ishlashi kelishilgach to'ldiriladi.", mehTplBtn:"Shartnoma shablonini ochish", camShot:"Suratga olish", camClose:"Yopish", camReading:"O'qilmoqda…", setTitle:"Sozlamalar", setSub:"Ma'lumotlar Google Sheets jadvalida saqlanadi — barcha kompyuterlarda bir xil ko'rinadi.",
+  mehEmpty:"Bo'lim tayyorlanmoqda", mehEmptyText:"Bu yerda mehnat shartnomalari tuziladi, saqlanadi, chop etiladi va Word'da yuklab olinadi. Qanday ishlashi kelishilgach to'ldiriladi.", mehTplBtn:"Shartnoma shablonini ochish", mehDocxNote:"Shablon Word fayl ko'rinishida yuklangan, shuning uchun bu yerda ko'rinmaydi. «Word yuklab olish» tugmasi bilan to'ldirilgan shartnomani oling.", camShot:"Suratga olish", camClose:"Yopish", camReading:"O'qilmoqda…", setTitle:"Sozlamalar", setSub:"Ma'lumotlar Google Sheets jadvalida saqlanadi — barcha kompyuterlarda bir xil ko'rinadi.",
   setUrl:"Google Apps Script veb-ilova manzili (URL)", setToken:"Parol", setTokenPh:"Apps Script'dagi PAROL", setFirm:"Firma nomi",
   setSave:"Saqlash va ulanish", setPush:"Hozirgi ma'lumotlarni Sheets'ga yuborish", setPull:"Sheets'dan qayta yuklash", setOff:"Uzish",
   setHowTitle:"Google Sheets'ni qanday ulash kerak", setCodeLink:"Apps Script kodini ochish (Code.gs) →", edPage:"+ yangi varaq"
@@ -1170,7 +1190,7 @@ const TAGS = [
   ['haydovchi1','Asosiy haydovchi: Familiya I.O (Sharofiddinov X.J)'],['guvohnoma1','Asosiy haydovchi guvohnomasi (prava) seriya va raqami'],['telefon1','Asosiy haydovchi telefoni'],
   ['haydovchi2',"Qo'shimcha haydovchi: Familiya I.O"],['guvohnoma2','Yordamchi haydovchi guvohnomasi (prava)'],['telefon2','Yordamchi haydovchi telefoni'],
   ['litsenziya','Litsenziya AT raqami'],['litsenziya_gacha','Litsenziya amal qilish muddati'],['yonalish',"Yo'nalish raqami"],
-  ['davlat_raqami','Mashina davlat raqami'],['mashina','Mashina rusumi'],['mashina_rangi','Mashina rangi'],['tex_pasport','Tex pasport seriya va raqami']];
+  ['davlat_raqami','Mashina davlat raqami'],['sh_raqam','Mehnat shartnomasi raqami'],['sh_sana','Shartnoma sanasi'],['rahbar','Rahbar F.I.Sh.'],['xodim_fio','Xodim F.I.Sh.'],['xodim_qisqa','Xodim: Familiya I.O'],['xodim_pasport','Xodim pasporti'],['xodim_jshshir','Xodim JShShIR'],['xodim_manzil','Xodim manzili'],['xodim_tel','Xodim telefoni'],['lavozim','Lavozim'],['bolim',"Bo'lim"],['maosh','Oylik maosh'],['ish_boshlash','Ish boshlash sanasi'],['ish_tugash','Shartnoma muddati'],['sinov','Sinov muddati'],['ish_vaqti','Ish vaqti'],['mashina','Mashina rusumi'],['mashina_rangi','Mashina rangi'],['tex_pasport','Tex pasport seriya va raqami']];
 const PADW = {raqam:3,sana_dan:11,sana_gacha:11,yil:2,haydovchi1:32,guvohnoma1:10,davlat_raqami:12,haydovchi2:31,guvohnoma2:8};
 /* Times New Roman harf kengliklari (1000 = 1 em) — chiziq o'rniga yozilgan matn chiziq bilan bir xil kenglikda bo'lishi uchun */
 const TNR_UP={A:722,B:667,C:667,D:722,E:611,F:556,G:722,H:722,I:333,J:389,K:722,L:611,M:889,N:722,O:722,P:556,Q:722,R:667,S:556,T:611,U:722,V:722,W:944,X:722,Y:722,Z:611};
@@ -1279,7 +1299,11 @@ const dayMonth=s=>{if(!s)return '';const [y,m,d]=s.split('-');return Number(d)+'
 /* ---------- Shablon muharriri (Word ko'rinishidagi) ---------- */
 const FLD_LABEL = {raqam:"Raqam",sana_dan:"Sana (dan)",sana_gacha:"Sana (gacha)",yil:"Yil",yonalish:"Yo'nalish №",litsenziya:"Litsenziya №",litsenziya_gacha:"Litsenziya muddati",
   haydovchi1:"1-haydovchi F.I.Sh",guvohnoma1:"1-haydovchi prava",telefon1:"1-haydovchi tel.",haydovchi2:"2-haydovchi F.I.Sh",guvohnoma2:"2-haydovchi prava",telefon2:"2-haydovchi tel.",
-  davlat_raqami:"Davlat raqami",mashina:"Mashina",mashina_rangi:"Mashina rangi",tex_pasport:"Tex pasport",sana:"Bugungi sana",firma:"Firma nomi"};
+  davlat_raqami:"Davlat raqami",mashina:"Mashina",mashina_rangi:"Mashina rangi",tex_pasport:"Tex pasport",sana:"Bugungi sana",firma:"Firma nomi",
+  sh_raqam:"Shartnoma №",sh_sana:"Shartnoma sanasi",rahbar:"Rahbar F.I.Sh.",xodim_fio:"Xodim F.I.Sh.",xodim_qisqa:"Xodim (Familiya I.O)",xodim_pasport:"Xodim pasporti",xodim_jshshir:"Xodim JShShIR",xodim_manzil:"Xodim manzili",xodim_tel:"Xodim telefoni",xodim_tugilgan:"Tug'ilgan sana",
+  lavozim:"Lavozim",bolim:"Bo'lim",maosh:"Maosh",ish_boshlash:"Ish boshlash sanasi",ish_tugash:"Shartnoma muddati",sinov:"Sinov muddati",ish_vaqti:"Ish vaqti"};
+const FLD_SETS = {yol:['raqam','sana_dan','sana_gacha','yil','yonalish','litsenziya','litsenziya_gacha','haydovchi1','guvohnoma1','telefon1','haydovchi2','guvohnoma2','telefon2','davlat_raqami','mashina','mashina_rangi','tex_pasport','sana','firma'],
+  mehnat:['sh_raqam','sh_sana','firma','rahbar','xodim_fio','xodim_qisqa','xodim_pasport','xodim_jshshir','xodim_manzil','xodim_tel','xodim_tugilgan','lavozim','bolim','maosh','ish_boshlash','ish_tugash','sinov','ish_vaqti','sana']};
 const FLD = k => '<span class="fld" data-f="'+k+'" contenteditable="false">'+FLD_LABEL[k]+'</span>';
 const GRID_HEAD = ['№','Işga çiqarilgan haydovçilarning F.I.Ş','Haydovçining imzosi','Tibbiy xodim imzosi','Tibbiy xodim muxri','Mexanik xodim muxri','Mexanik xodim imzosi','Kunlik tölov','IZOX'];
 const GRID_W = [5,22,13,10,10,11,11,9,9];
@@ -1316,8 +1340,22 @@ const DEFAULT_HTML = {
     Array.from({length:31},(_,i)=>'<tr>'+GRID_HEAD.map((h,c)=>'<td style="height:19.25pt">'+(c===0?(i+1):'')+'</td>').join('')+'</tr>').join('')+'</table>'+
   '<div class="pgbreak" contenteditable="false"></div>'+p2Html(),
   mehnat:
-  '<p style="text-align:center;font-weight:700">MEHNAT SHARTNOMASI</p><p>&nbsp;</p>'+
-  '<p>Bu yerga mehnat shartnomasi matnini yozing yoki «Word fayldan ochish» tugmasi bilan faylni oching. Ma\'lumot yoziladigan joyga yuqoridagi maydon tugmalarini qo\'ying, masalan: '+FLD('haydovchi1')+'.</p>'
+  '<p style="text-align:center;font-weight:700;font-size:15pt">MEHNAT SHARTNOMASI № '+FLD('sh_raqam')+'</p>'+
+  '<table class="lay"><tr><td style="text-align:left">Marg\'ilon sh.</td><td style="text-align:right">'+FLD('sh_sana')+'</td></tr></table><p>&nbsp;</p>'+
+  '<p style="text-align:justify">'+FLD('firma')+' (keyingi o\'rinlarda «Ish beruvchi») nomidan '+FLD('rahbar')+' bir tomondan, fuqaro '+FLD('xodim_fio')+' (pasport/ID: '+FLD('xodim_pasport')+', JShShIR: '+FLD('xodim_jshshir')+', yashash manzili: '+FLD('xodim_manzil')+') (keyingi o\'rinlarda «Xodim») ikkinchi tomondan, O\'zbekiston Respublikasi Mehnat kodeksiga muvofiq ushbu shartnomani quyidagilar haqida tuzdilar.</p><p>&nbsp;</p>'+
+  '<p style="font-weight:700">1. Shartnoma predmeti</p>'+
+  '<p style="text-align:justify">1.1. Xodim '+FLD('lavozim')+' lavozimiga ('+FLD('bolim')+') ishga qabul qilinadi.</p>'+
+  '<p style="text-align:justify">1.2. Ishni boshlash sanasi: '+FLD('ish_boshlash')+'. Shartnoma muddati: '+FLD('ish_tugash')+'. Sinov muddati: '+FLD('sinov')+'.</p><p>&nbsp;</p>'+
+  '<p style="font-weight:700">2. Ish vaqti va mehnatga haq to\'lash</p>'+
+  '<p style="text-align:justify">2.1. Ish vaqti: '+FLD('ish_vaqti')+'.</p>'+
+  '<p style="text-align:justify">2.2. Xodimga oylik ish haqi '+FLD('maosh')+' miqdorida belgilanadi va qonunchilikda belgilangan muddatlarda to\'lanadi.</p><p>&nbsp;</p>'+
+  '<p style="font-weight:700">3. Tomonlarning majburiyatlari</p>'+
+  '<p style="text-align:justify">3.1. Xodim o\'z mehnat vazifalarini vijdonan bajarishi, ichki mehnat tartibi qoidalariga, mehnatni muhofaza qilish va xavfsizlik talablariga rioya qilishi shart.</p>'+
+  '<p style="text-align:justify">3.2. Ish beruvchi Xodimni shartnomada belgilangan ish bilan ta\'minlashi, xavfsiz mehnat sharoitini yaratishi va ish haqini o\'z vaqtida to\'lashi shart.</p><p>&nbsp;</p>'+
+  '<p style="font-weight:700">4. Yakuniy qoidalar</p>'+
+  '<p style="text-align:justify">4.1. Shartnoma ikki nusxada tuzildi, har bir nusxa bir xil yuridik kuchga ega. Shartnomada nazarda tutilmagan masalalar O\'zbekiston Respublikasi Mehnat kodeksi bilan tartibga solinadi.</p><p>&nbsp;</p>'+
+  '<table class="lay"><tr><td style="width:50%"><b>Ish beruvchi:</b><br>'+FLD('firma')+'<br>'+FLD('rahbar')+'<br><br>Imzo: ____________</td>'+
+  '<td style="width:50%"><b>Xodim:</b><br>'+FLD('xodim_qisqa')+'<br>Tel.: '+FLD('xodim_tel')+'<br><br>Imzo: ____________</td></tr></table>'
 };
 const BLANK = {litsenziya:'________________',litsenziya_gacha:'___________',yonalish:'________',haydovchi2:'______________________',guvohnoma2:'______________'};
 const PRINT_CSS = '@page{size:A4;margin:10mm}html,body{margin:0;background:#fff}'+
@@ -1502,6 +1540,38 @@ function parseTex(text){
   const col=Object.keys(CAR_COLORS).find(c=>new RegExp('\\b'+c+'\\b').test(flat));if(col)out.rang=CAR_COLORS[col];
   return out;
 }
+ENT.mehnat = {key:'firma-mehnat-v1', nav:'Mehnat shartnomasi', listTitle:'Mehnat shartnomalari', add:'+ Yangi mehnat shartnomasi', newTitle:'Yangi mehnat shartnomasi', editTitle:'Mehnat shartnomasini tahrirlash', kicker:'Shartnoma tuzish', one:'shartnoma', autoNo:true, doc:true,
+  searchPh:'Xodim, lavozim yoki shartnoma raqami', emptyTitle:'Hali mehnat shartnomasi tuzilmagan', emptyText:"«+ Yangi mehnat shartnomasi» tugmasi bilan birinchi shartnomani tuzing.",
+  sections:[
+    {title:'Shartnoma', fields:[
+      {k:'raqam',l:'Shartnoma raqami',req:1,raw:1,num:1,ph:'1'},
+      {k:'sana',l:'Tuzilgan sana',req:1,type:'date',raw:1,today:1},
+      {k:'rahbar',l:'Ish beruvchi vakili (rahbar F.I.Sh.)',ph:'Aliyev Vali Karimovich'},
+      {k:'holat',l:'Holati',opts:['Faol','Bekor qilingan']}]},
+    {title:'Xodim', fields:[
+      {k:'kimTuri',l:'Kim bilan',seg:['Haydovchi','Ichki xodim'],col:'1/-1',reset:['xodimId']},
+      {k:'xodimId',l:'Xodim',req:1,dyn:(f,d)=>(f.kimTuri==='Ichki xodim'?(d.staff||[]):(d.drivers||[])).map(x=>({v:x.id,l:fio(x)})),
+        emptyOpt:f=>f.kimTuri==='Ichki xodim'?"— avval ichki xodim qo'shing —":"— avval haydovchi qo'shing —"}]},
+    {title:'Ish sharoiti', fields:[
+      {k:'lavozim',l:'Lavozimi',req:1,ph:'Haydovchi'},
+      {k:'bolim',l:"Bo'limi",ph:'Transport'},
+      {k:'maosh',l:"Oylik maosh (so'm)",req:1,raw:1,num:1,ph:'5000000'},
+      {k:'ishVaqti',l:'Ish vaqti',ph:'09:00–18:00, 6 kunlik'},
+      {k:'ishBoshlash',l:'Ishni boshlash sanasi',req:1,type:'date',raw:1,today:1},
+      {k:'muddatTuri',l:'Shartnoma muddati',seg:['Muddatsiz','Muddatli'],col:'1/-1'},
+      {k:'ishTugash',l:'Tugash sanasi',req:1,type:'date',raw:1,when:f=>f.muddatTuri==='Muddatli'},
+      {k:'sinov',l:'Sinov muddati',opts:["Yo'q",'1 oy','2 oy','3 oy']},
+      {k:'izoh',l:'Izoh',ph:"Qo'shimcha shartlar",col:'1/-1'}]}],
+  cols:['№','Xodim','Lavozim','Maosh','Muddat','Holat'],
+  beforeSave:(x,d)=>{const p=(x.kimTuri==='Ichki xodim'?(d.staff||[]):(d.drivers||[])).find(y=>y.id===x.xodimId);if(p){const c={...p};delete c.rasm;x.xodimSnap=c;x.xodimNomi=fio(p);}return x;},
+  row:(x,T)=>{const left=x.muddatTuri==='Muddatli'&&x.ishTugash?dayDiff(x.ishTugash,today()):null;
+    return [{v:String(x.raqam||'—'),w:700},{v:T(x.xodimNomi||'—'),sub:T(x.kimTuri||''),w:600},{v:T(x.lavozim),sub:T(x.bolim||'')},{v:T(fmt(x.maosh)),w:600},
+      {v:x.muddatTuri==='Muddatli'?fd(x.ishBoshlash)+' – '+fd(x.ishTugash):T('Muddatsiz'),sub:left!==null?(left<0?T('Muddati tugagan'):T('Tugashiga '+left+' kun')):T(fd(x.ishBoshlash)+' dan'),color:left!==null&&left<=30?'#B45309':'inherit'},
+      {v:T(x.holat||'Faol'),color:x.holat==='Bekor qilingan'?'#B91C1C':'#15803D',w:600}];},
+  summary:(list,d,T)=>{const fa=list.filter(x=>x.holat!=='Bekor qilingan');const soon=fa.filter(x=>x.muddatTuri==='Muddatli'&&x.ishTugash&&dayDiff(x.ishTugash,today())<=30);
+    return [{label:'Faol shartnomalar',value:String(fa.length),note:list.length+' ta jami',color:'#15803D',bar:'#22C55E'},
+      {label:'Oylik maosh fondi',value:fmt(sumOf(fa.map(x=>({summa:x.maosh})))),note:'Faol shartnomalar bo\'yicha',color:'#1D4ED8',bar:'#3B82F6'},
+      {label:'30 kun ichida tugaydi',value:String(soon.length),note:'Muddatli shartnomalar',color:'#B45309',bar:'#F59E0B'}];}};
 const STAFF_SEED = [['Rahimov','Akmal','Bosh menejer','Boshqaruv'],['Karimova','Dilnoza','Sotuv menejeri','Sotuv'],['Tursunov','Sardor','Yurist','Yuridik'],['Yusupova','Malika','Hisobchi','Hisobxona']]
   .map(([f,i,l,b],n)=>({id:'x'+n,familiya:f,ism:i,otasi:'',telefon:'+998 90 55'+n+' 1'+n+' 2'+n,lavozim:l,bolim:b,kirgan:'2025-0'+(n+2)+'-01',holat:'Faol'}));
 function shrinkImage(file,cb){
@@ -1570,7 +1640,8 @@ class Component extends DCLogic {
     catch(e){this.setState({sync:'err',syncErr:String(e.message||e),setMsg:{ok:0,text:"Ulanib bo'lmadi: "+errText(e)}});}}
   markRead(keys){const readN=Array.from(new Set([...(this.state.readN||[]),...keys]));this.setState({readN});try{localStorage.setItem(NKEY,JSON.stringify(readN));}catch(e){}this.push('readN',readN);}
   persistE(ent,list){this.setState(st=>({data:{...st.data,[ent]:list}}));try{localStorage.setItem(ENT[ent].key,JSON.stringify(list));}catch(e){}this.push(ent,list);}
-  goE(ent,view){this.go(view,{ent,eq:'',flash:'',photoErr:'',scanMsg:null,eForm:view==='eform'?blankE(ent):null,eEditId:null});}
+  goE(ent,view){let bf=null;if(view==='eform'){bf=blankE(ent);if(ENT[ent].autoNo){const L=this.state.data[ent]||[];bf.raqam=String(L.reduce((a,c)=>Math.max(a,Number(c.raqam)||0),0)+1);const last=L[0];if(last&&last.rahbar)bf.rahbar=last.rahbar;}}
+    this.go(view,{ent,eq:'',flash:'',photoErr:'',scanMsg:null,eForm:bf,eEditId:null});}
   goNewYV(){this.go('new',{form:this.blank(),editId:null});}
   editItem(it){this.go('new',{form:{raqam:String(it.raqam),dan:it.dan,gacha:it.gacha,h1:it.h1,h2:it.h2||'',showH2:!!it.h2,izoh:it.izoh||'',lits:it.lits||'',litsGacha:it.litsGacha||'',yonalish:it.yonalish||''},editId:it.id});}
   renew(it){let dan=addDays(it.gacha,1);if(dan<today())dan=today();const len=Math.max(1,monthsBetween(it.dan,it.gacha));
@@ -1587,6 +1658,22 @@ class Component extends DCLogic {
     const KEEP=['haydovchi1','haydovchi2','mijoz','guvohnoma1','guvohnoma2','davlat_raqami','litsenziya','tex_pasport','mashina','telefon1','telefon2'];
     const vals={};Object.keys(vals0).forEach(k=>vals[k]=nw&&KEEP.indexOf(k)<0?toNew(String(vals0[k])):vals0[k]);return vals;
   }
+  valsMehnat(c){
+    const d=this.state.data,list=c.kimTuri==='Ichki xodim'?(d.staff||[]):(d.drivers||[]);const p=list.find(x=>x.id===c.xodimId)||c.xodimSnap||{};
+    const j=(...x)=>x.filter(Boolean).join(' ');
+    return {sh_raqam:String(c.raqam||''),sh_sana:fd(c.sana),sana:fd(today()),firma:this.props.firmName??'Firma',rahbar:c.rahbar||'',
+      xodim_fio:fio(p),xodim_qisqa:fioShort(p),xodim_pasport:j(p.hujjatSeriya,p.hujjatRaqam),xodim_jshshir:p.jshshir||'',xodim_manzil:[p.shahar,addr(p)].filter(Boolean).join(', '),
+      xodim_tel:p.telefon||'',xodim_tugilgan:fd(p.tugilgan),lavozim:c.lavozim||'',bolim:c.bolim||'',maosh:c.maosh?fmt(c.maosh):'',ishVaqti:c.ishVaqti||'',ish_vaqti:c.ishVaqti||'',
+      ish_boshlash:fd(c.ishBoshlash),ish_tugash:c.muddatTuri==='Muddatli'?fd(c.ishTugash)+' gacha':'muddatsiz',sinov:c.sinov&&c.sinov!=="Yo'q"?c.sinov:"belgilanmagan"};
+  }
+  async makeMehnat(c){
+    const tp=this.state.tpl.mehnat,vals=this.valsMehnat(c),name='mehnat-shartnoma-'+(c.raqam||'');
+    try{
+      if(!tp||tp.mode==='html'){saveBlob(await htmlToDocx(fillHtml((tp&&tp.html)||DEFAULT_HTML.mehnat,vals)),name+'.docx');}
+      else{saveBlob(await buildDocx(tp.b64,vals,false),name+'.docx');}
+      this.setState({yvMsg:{ok:1,text:"Word fayl yuklab olindi: "+name+".docx"}});
+    }catch(e){this.setState({yvMsg:{ok:0,text:e&&e.message==='nolib'?"Word bilan ishlash kutubxonasi yuklanmadi. Sahifani yangilang.":"Shartnomani tuzib bo'lmadi. Bilim bazasidagi shablonni tekshiring."}});}
+  }
   async makeYV(c){
     const tp=this.state.tpl.yol;
     try{
@@ -1602,19 +1689,19 @@ class Component extends DCLogic {
       this.setState({yvMsg:{ok:0,text:e&&e.message==='nolib'?"Word bilan ishlash kutubxonasi yuklanmadi. Internetni tekshirib, sahifani yangilang.":"Yo'l varaqasini tuzib bo'lmadi. Bilim bazasidagi shablonni tekshiring."}});
     }
   }
-  printSheet(){
+  printSheet(fname){
     const node=document.querySelector('.sheetdoc')||document.querySelector('article.sheet');
-    const done=ok=>this.setState({yvMsg:ok?{ok:1,text:"Yo'l varaqasi yangi oynada ochildi — chop etish oynasi o'zi chiqadi."}:{ok:0,text:"Brauzer bu oynada chop etishni to'sib qo'ydi. «Word yuklab olish» tugmasini bosing va faylni Word'da chop eting."}});
+    const done=ok=>this.setState({yvMsg:ok?{ok:1,text:"Hujjat yangi oynada ochildi — chop etish oynasi o'zi chiqadi."}:{ok:0,text:"Brauzer bu oynada chop etishni to'sib qo'ydi. «Word yuklab olish» tugmasini bosing va faylni Word'da chop eting."}});
     if(!node){done(false);return;}
     const html='<!doctype html><html lang="uz"><head><meta charset="utf-8"><title>Yo\u2018l varaqasi</title><style>'+PRINT_CSS+'</style></head><body>'+node.outerHTML+
       '<scr'+'ipt>window.addEventListener("load",function(){setTimeout(function(){window.focus();window.print();},350);});</scr'+'ipt></body></html>';
     let w=null;
     try{const url=URL.createObjectURL(new Blob([html],{type:'text/html'}));w=window.open(url,'_blank');setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(e){}},60000);}catch(e){w=null;}
     if(w){done(true);return;}
-    this.makePdf(node);
+    this.makePdf(node,fname);
   }
-  async makePdf(node){
-    const cur=(this.state.items||[]).find(c=>c.id===this.state.curId)||{};
+  async makePdf(node,fname){
+    const cur=(this.state.items||[]).find(c=>c.id===this.state.curId)||{};fname=fname||('yol-varaqasi-'+(cur.raqam||''));
     if(!window.html2canvas||!window.jspdf){this.setState({yvMsg:{ok:0,text:"Chop etish uchun PDF kutubxonasi yuklanmadi. Sahifani yangilang yoki «Word yuklab olish» tugmasidan foydalaning."}});return;}
     this.setState({yvMsg:{ok:1,text:"PDF tayyorlanmoqda…"}});
     const pages=[];let pg=[];Array.from(node.childNodes).forEach(n=>{if(n.nodeType===1&&n.classList&&n.classList.contains('pgbreak')){pages.push(pg);pg=[];}else pg.push(n);});pages.push(pg);
@@ -1628,7 +1715,7 @@ class Component extends DCLogic {
         let w=190,h=c.height*w/c.width;if(h>277){w=w*277/h;h=277;}
         if(i)pdf.addPage();pdf.addImage(c.toDataURL('image/jpeg',0.92),'JPEG',10+(190-w)/2,10,w,h);
       }
-      saveBlob(pdf.output('blob'),'yol-varaqasi-'+(cur.raqam||'')+'.pdf');
+      saveBlob(pdf.output('blob'),fname+'.pdf');
       this.setState({yvMsg:{ok:1,text:"PDF yuklab olindi ("+pages.length+" varaq). Faylni oching va chop eting."}});
     }catch(e){this.setState({yvMsg:{ok:0,text:"PDF tayyorlab bo'lmadi. «Word yuklab olish» tugmasidan foydalaning."}});}
     finally{try{host.remove();}catch(e){}}
@@ -1779,7 +1866,7 @@ class Component extends DCLogic {
     const now=new Date();const ym=today().slice(0,7);
     const drivers=s.data.drivers||[];
     const drvOf=(id,snap)=>drivers.find(x=>x.id===id)||snap||null;
-    const navView=s.view==='dash'?'dash':s.view==='new'&&!s.editId?'new':(s.view==='elist'||s.view==='eform')?s.ent:(s.view==='kb'||s.view==='tpledit')?'kb':s.view==='settings'?'settings':s.view==='mehnat'?'mehnat':'list';
+    const navView=s.view==='dash'?'dash':s.view==='new'&&!s.editId?'new':(s.view==='elist'||s.view==='eform')?s.ent:s.view==='edoc'?'mehnat':(s.view==='kb'||s.view==='tpledit')?'kb':s.view==='settings'?'settings':s.view==='mehnat'?'mehnat':'list';
     // entity (haydovchi / xodim / firma)
     const ent=ENT[s.ent], elist=s.data[s.ent]||[], ef=s.eForm||blankE(s.ent);
     const setF=(k,v)=>this.setState(st=>({eForm:{...(st.eForm||blankE(st.ent)),[k]:v}}));
@@ -1800,14 +1887,14 @@ class Component extends DCLogic {
             shrinkImage(file,(err,url)=>{if(err){this.setState({photoErr:T("Rasmni o'qib bo'lmadi.")});return;}this.setState({photoErr:''});setF(f.k,url);});return;}
           let v=e.target.value;if(f.up)v=v.toUpperCase();if(f.num)v=v.replace(/\D/g,'');setF(f.k,v);}};
       if(f.dyn){const names=f.dyn(ef,s.data).filter(Boolean);
-        o.options=[{v:'',l:T(names.length?'— tanlang —':f.emptyOpt(ef))},...names.map(x=>({v:x,l:T(x)}))];}
+        o.options=[{v:'',l:T(names.length?'— tanlang —':f.emptyOpt(ef))},...names.map(x=>typeof x==='object'?{v:x.v,l:T(x.l)}:{v:x,l:T(x)})];}
       else if(opts)o.options=opts.map(x=>({v:x,l:T(x),cls:val===x?'on':'',pressed:val===x?'true':'false',
         pick:()=>this.setState(st=>{const cur={...(st.eForm||blankE(st.ent)),[f.k]:x};if(f.reset&&st.eForm&&st.eForm[f.k]!==x)f.reset.forEach(r=>cur[r]='');return {eForm:cur};})}));
       return o;})}));
     const eq=s.eq.trim().toLowerCase();
     const erows=elist.filter(x=>{if(!eq)return true;const r=Object.entries(x).filter(([k])=>k!=='rasm').map(([,v])=>v).join(' ');return (r+' '+conv('cyr',r)+' '+conv('new',r)).toLowerCase().includes(eq);})
       .map(x=>({cells:ent.row(x,T).map(c=>({v:c.v||'—',sub:c.sub||'',w:c.w||400,img:c.img||'',ini:c.ini||'',color:c.color||'inherit'})),
-        edit:()=>this.go('eform',{eForm:{...blankE(s.ent),...x},eEditId:x.id,flash:''}),
+        edit:()=>this.go('eform',{eForm:{...blankE(s.ent),...x},eEditId:x.id,flash:''}),hasDoc:!!ent.doc,view:()=>this.go('edoc',{edocId:x.id,yvMsg:null}),
         normal:s.delId!==x.id,asking:s.delId===x.id,
         del:()=>this.setState({delId:x.id}),no:()=>this.setState({delId:null}),
         yes:()=>{this.persistE(s.ent,elist.filter(y=>y.id!==x.id));this.setState({delId:null,flash:T(ent.one.charAt(0).toUpperCase()+ent.one.slice(1)+" o'chirildi.")});}}));
@@ -1823,9 +1910,11 @@ class Component extends DCLogic {
       save:()=>{
         const miss=[];ent.sections.forEach((sec,si)=>visible[si].forEach(f=>{if(f.req&&!String(ef[f.k]??'').trim())miss.push(f.l);}));
         if(miss.length){this.setState({err:T("To'ldirilmagan maydonlar: "+miss.join(', '))});return;}
-        const clean={...ef};ent.sections.forEach(sec=>sec.fields.forEach(f=>{if(f.when&&!f.when(ef))delete clean[f.k];}));
+        let clean={...ef};ent.sections.forEach(sec=>sec.fields.forEach(f=>{if(f.when&&!f.when(ef))delete clean[f.k];}));if(ent.beforeSave)clean=ent.beforeSave(clean,s.data);
+        const nid=s.eEditId||s.ent[0]+Date.now();
         if(s.eEditId){this.persistE(s.ent,elist.map(y=>y.id===s.eEditId?{...clean,id:s.eEditId}:y));}
-        else{this.persistE(s.ent,[{...clean,id:s.ent[0]+Date.now()},...elist]);}
+        else{this.persistE(s.ent,[{...clean,id:nid},...elist]);}
+        if(ent.doc){this.go('edoc',{edocId:nid,eForm:null,eEditId:null,yvMsg:{ok:1,text:"Shartnoma saqlandi. Endi uni chop etish yoki Word faylini yuklab olish mumkin."}});return;}
         this.go('elist',{eq:'',eForm:null,eEditId:null,flash:T(s.eEditId?"O'zgarishlar saqlandi.":ent.newTitle+" saqlandi.")});
       }
     };
@@ -1855,7 +1944,7 @@ class Component extends DCLogic {
       size:s.edSize||'14',sizes:['8','9','10','11','12','13','14','16','18','20','24'],onSize:e=>this.setSize(e.target.value),
       blank:()=>this.cmd('insertText','____________'),
       rowAdd:()=>this.tableOp('rowAdd'),rowDel:()=>this.tableOp('rowDel'),colAdd:()=>this.tableOp('colAdd'),colDel:()=>this.tableOp('colDel'),tableAdd:()=>this.tableOp('add'),pageBreak:()=>this.cmd('insertHTML','<div class="pgbreak" contenteditable="false"></div><p>&nbsp;</p>'),
-      fields:Object.keys(FLD_LABEL).map(k=>({label:T(FLD_LABEL[k]),hint:T((TAGS.find(x=>x[0]===k)||[k,FLD_LABEL[k]])[1]),insert:()=>this.insertField(k)})),
+      fields:(FLD_SETS[ek]||Object.keys(FLD_LABEL)).map(k=>({label:T(FLD_LABEL[k]),hint:T((TAGS.find(x=>x[0]===k)||[k,FLD_LABEL[k]])[1]),insert:()=>this.insertField(k)})),
       save:()=>this.saveEditor(),cancel:()=>this.go('kb'),
       reset:()=>{if(this.ed){this.ed.innerHTML=DEFAULT_HTML[ek];this.setState({edMsg:{ok:1,text:"Standart shakl qo'yildi. O'zgarishni saqlash uchun «Saqlash» tugmasini bosing."}});}},
       onImport:e=>this.importDocx(e)};
@@ -1933,6 +2022,11 @@ class Component extends DCLogic {
     const ytp=s.tpl.yol, htmlMode=!ytp||ytp.mode==='html';
     this.sheetHtml='';
     if(cur&&htmlMode){const h=(ytp&&ytp.html)||DEFAULT_HTML.yol;this.sheetHtml=fillHtml(h,this.valsFor(cur,NEWCH.test(htmlText(h))));}
+    const mdoc=s.view==='edoc'?(s.data.mehnat||[]).find(x=>x.id===s.edocId):null, mtp=s.tpl.mehnat, mHtml=!mtp||mtp.mode==='html';
+    if(mdoc&&mHtml)this.sheetHtml=fillHtml((mtp&&mtp.html)||DEFAULT_HTML.mehnat,this.valsMehnat(mdoc));
+    const dc=mdoc?{title:T('Mehnat shartnomasi № '+(mdoc.raqam||'')),sub:T((mdoc.xodimNomi||'')+' · '+(mdoc.lavozim||'')),preview:mHtml,noPreview:!mHtml,
+      print:()=>this.printSheet('mehnat-shartnoma-'+(mdoc.raqam||'')),word:()=>this.makeMehnat(mdoc),
+      edit:()=>this.go('eform',{ent:'mehnat',eForm:{...blankE('mehnat'),...mdoc},eEditId:mdoc.id,flash:''}),back:()=>this.goE('mehnat','elist')}:{};
     if(cur){const a=drvOf(cur.h1,cur.d1)||{},b=cur.h2?(drvOf(cur.h2,cur.d2)||{}):null,st=stOf(cur);
       const j=(...x)=>x.filter(Boolean).join(' ');
       cview={word:()=>this.makeYV(cur),renew:()=>this.renew(cur),stBg:st.bg,stColor:st.color,
@@ -1952,7 +2046,7 @@ class Component extends DCLogic {
     return {
       t, firm, scripts,
       today:T(now.getDate()+'-'+MONF[now.getMonth()]+', '+now.getFullYear()+'-yil'),
-      nav:navDef.map(([v,l])=>({label:l,icon:ICON[v],cls:navView===v?'on':'',go:()=>v==='new'?this.goNewYV():this.go(v)})),
+      nav:navDef.map(([v,l])=>({label:l,icon:ICON[v],cls:navView===v?'on':'',go:()=>v==='new'?this.goNewYV():v==='mehnat'?this.goE('mehnat','elist'):this.go(v)})),
       isDash:s.view==='dash',isList:s.view==='list',isNew:s.view==='new',isView:s.view==='view'&&!!cur,
       isEList:s.view==='elist',isEForm:s.view==='eform',isKb:s.view==='kb',isMehnat:s.view==='mehnat',openMehnatTpl:()=>this.openEditor('mehnat'),
       e,nav2,nav3,tpls,
@@ -1992,7 +2086,7 @@ class Component extends DCLogic {
         this.persist(s.editId?items.map(c=>c.id===s.editId?rec:c):[rec,...items]);
         this.go('view',{curId:rec.id,yvMsg:{ok:1,text:"Yo'l varaqasi saqlandi. Endi uni chop etish yoki Word faylini yuklab olish mumkin."}});
       },
-      c:cview,sh,vcards,htmlSheet:htmlMode,oldSheet:!htmlMode,sheetRef:this.sheetRefCb,isTplEdit:s.view==='tpledit',ed,
+      c:cview,sh,vcards,htmlSheet:htmlMode,oldSheet:!htmlMode,isEdoc:s.view==='edoc'&&!!mdoc,dc,sheetRef:this.sheetRefCb,isTplEdit:s.view==='tpledit',ed,
       cam:{open:!!s.cam,mrz:!!(s.cam&&s.cam.kind==='mrz'),busy:!!(s.cam&&s.cam.busy),ref:this.camRefCb,msg:s.cam?T(s.cam.msg||''):'',
         title:s.cam?T(({mrz:'Pasport / ID karta',prava:'Haydovchilik guvohnomasi (prava)',tex:'Tex pasport'})[s.cam.kind]||''):'',
         shot:()=>this.camShot(),close:()=>{this.stopCam();this.setState({cam:null});}},

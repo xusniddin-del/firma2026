@@ -23,6 +23,7 @@ const SHEETS = {
   firms:    'Firmalar',
   payments: "To'lovlar",
   fond:     'Fond',
+  mehnat:   'Mehnat shartnomalari',
   readN:    "O'qilgan bildirishnomalar",
   tpl:      'Shablonlar'
 };
