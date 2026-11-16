@@ -767,6 +767,24 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,
         </div>
       </sc-if>
 
+      <!-- MEHNAT SHARTNOMASI -->
+      <sc-if value="{{ isMehnat }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div>
+            <h1 style="margin:0;font-size:26px;font-weight:800;letter-spacing:-.02em">{{ t.mehTitle }}</h1>
+            <div class="sub" style="font-size:14px">{{ t.mehSub }}</div>
+          </div>
+          <div class="card" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:56px 24px">
+            <div style="width:64px;height:64px;border-radius:18px;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8l3 3v15H5V3h3M9 3v4h6V3M8 12h8M8 16h5M15 18l1.5 1.5L20 16"></path></svg>
+            </div>
+            <div style="font-size:18px;font-weight:700">{{ t.mehEmpty }}</div>
+            <div style="font-size:14px;color:var(--muted);max-width:460px">{{ t.mehEmptyText }}</div>
+            <button onClick="{{ openMehnatTpl }}" class="btn btn-soft">{{ t.mehTplBtn }}</button>
+          </div>
+        </div>
+      </sc-if>
+
       <!-- BILIM BAZASI -->
       <sc-if value="{{ isKb }}" hint-placeholder-val="{{ false }}">
         <div style="display:flex;flex-direction:column;gap:20px">
@@ -853,7 +871,7 @@ const NEWCH = /[ŞşÇçÖöĞğ]/;
 const ini = s => {s=String(s||'').trim();if(!s)return '';const m=s.match(/^(sh|ch|[og]['ʻ’‘`ʼ])/i);const x=m?m[0]:s[0];return x.charAt(0).toUpperCase()+x.slice(1).toLowerCase();};
 const fioShort = x => {if(!x)return '';const a=ini(x.ism),b=ini(x.otasi);return [x.familiya,a?(a+'.'+(b||'')):''].filter(Boolean).join(' ');};
 const SKEY = 'firma-alifbo-v1';
-const APP_VER = '2026.11.15-22.05';
+const APP_VER = '2026.11.16-13.25';
 const CFG_KEY = 'firma-sheets-v1';
 const DEFAULT_API = {url:'https://script.google.com/macros/s/AKfycby0hC_HsljZPv04H7ZQDKizrBm_Tbrt4QCGCVcCjikU5vS-dWMX0iHKVNm9eO88bJYxYw/exec',token:'',firm:''};
 const STAFF = ['Akmal Rahimov','Dilnoza Karimova','Sardor Tursunov','Malika Yusupova'];
@@ -930,7 +948,8 @@ const L = {
   edKicker:"Bilim bazasi · shablon muharriri", edHelp:"Matnni Word'dagidek yozing va tahrirlang. Ma'lumot yozilishi kerak bo'lgan joyni bosing (yoki ______ chiziqni sichqoncha bilan belgilang) va «Maydonlar» qatoridagi tugmani bosing. Hujjat tuzilganda o'sha joyga haydovchi ma'lumoti yoziladi.",
   edImport:"~Word~ fayldan ochish", edDefault:"Standart shakl", edUndo:"Ortga", edRedo:"Qaytarish", edBold:"Qalin", edItalic:"Qiya", edUnder:"Tagiga chizish",
   edSize:"Shrift:", edLeft:"Chapga", edCenter:"Markazga", edRight:"O'ngga", edJustify:"Ikki tomonga", edBlank:"____ chiziq", edBlankHint:"Bo'sh chiziq qo'yish",
-  edTable:"Jadval:", edRowAdd:"+ qator", edRowDel:"− qator", edColAdd:"+ ustun", edColDel:"− ustun", edTableAdd:"Yangi jadval", edFields:"Maydonlar:", setNav:"Sozlamalar", camShot:"Suratga olish", camClose:"Yopish", camReading:"O'qilmoqda…", setTitle:"Sozlamalar", setSub:"Ma'lumotlar Google Sheets jadvalida saqlanadi — barcha kompyuterlarda bir xil ko'rinadi.",
+  edTable:"Jadval:", edRowAdd:"+ qator", edRowDel:"− qator", edColAdd:"+ ustun", edColDel:"− ustun", edTableAdd:"Yangi jadval", edFields:"Maydonlar:", setNav:"Sozlamalar", mehTitle:"Mehnat shartnomasi", mehSub:"Xodimlar va haydovchilar bilan mehnat shartnomalarini tuzish",
+  mehEmpty:"Bo'lim tayyorlanmoqda", mehEmptyText:"Bu yerda mehnat shartnomalari tuziladi, saqlanadi, chop etiladi va Word'da yuklab olinadi. Qanday ishlashi kelishilgach to'ldiriladi.", mehTplBtn:"Shartnoma shablonini ochish", camShot:"Suratga olish", camClose:"Yopish", camReading:"O'qilmoqda…", setTitle:"Sozlamalar", setSub:"Ma'lumotlar Google Sheets jadvalida saqlanadi — barcha kompyuterlarda bir xil ko'rinadi.",
   setUrl:"Google Apps Script veb-ilova manzili (URL)", setToken:"Parol", setTokenPh:"Apps Script'dagi PAROL", setFirm:"Firma nomi",
   setSave:"Saqlash va ulanish", setPush:"Hozirgi ma'lumotlarni Sheets'ga yuborish", setPull:"Sheets'dan qayta yuklash", setOff:"Uzish",
   setHowTitle:"Google Sheets'ni qanday ulash kerak", setCodeLink:"Apps Script kodini ochish (Code.gs) →", edPage:"+ yangi varaq"
@@ -968,6 +987,7 @@ const ICON={
   staff:'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20a6 6 0 0 1 12 0M16 5.5a3 3 0 0 1 0 5.5M18 14a5 5 0 0 1 3 6',
   firms:'M4 21V7l8-4 8 4v14M4 21h16M9 21v-5h6v5M8 10h.01M12 10h.01M16 10h.01',
   kb:'M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5M9 7h6M9 11h6',
+  mehnat:'M8 3h8l3 3v15H5V3h3M9 3v4h6V3M8 12h8M8 16h5M15 18l1.5 1.5L20 16',
   payments:'M3 6h18v12H3zM3 10h18M7 15h4',
   fond:'M4 8h15a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a2 2 0 0 1 2-2h11v3M16 13.5h.01'
 };
@@ -1759,7 +1779,7 @@ class Component extends DCLogic {
     const now=new Date();const ym=today().slice(0,7);
     const drivers=s.data.drivers||[];
     const drvOf=(id,snap)=>drivers.find(x=>x.id===id)||snap||null;
-    const navView=s.view==='dash'?'dash':s.view==='new'&&!s.editId?'new':(s.view==='elist'||s.view==='eform')?s.ent:(s.view==='kb'||s.view==='tpledit')?'kb':s.view==='settings'?'settings':'list';
+    const navView=s.view==='dash'?'dash':s.view==='new'&&!s.editId?'new':(s.view==='elist'||s.view==='eform')?s.ent:(s.view==='kb'||s.view==='tpledit')?'kb':s.view==='settings'?'settings':s.view==='mehnat'?'mehnat':'list';
     // entity (haydovchi / xodim / firma)
     const ent=ENT[s.ent], elist=s.data[s.ent]||[], ef=s.eForm||blankE(s.ent);
     const setF=(k,v)=>this.setState(st=>({eForm:{...(st.eForm||blankE(st.ent)),[k]:v}}));
@@ -1809,10 +1829,10 @@ class Component extends DCLogic {
         this.go('elist',{eq:'',eForm:null,eEditId:null,flash:T(s.eEditId?"O'zgarishlar saqlandi.":ent.newTitle+" saqlandi.")});
       }
     };
-    const nav2=['drivers','staff','firms','kb'].map(k=>{
-      const on=navView===k;const n=k==='kb'?0:(s.data[k]||[]).length;
-      return {label:T(k==='kb'?'Bilim bazasi':ENT[k].nav),icon:ICON[k],cls:on?'on':'',badge:n?String(n):'',badgeBg:on?'rgba(255,255,255,.22)':'#EEF0F4',
-        go:()=>k==='kb'?this.go('kb'):this.goE(k,ENT[k].openForm?'eform':'elist')};});
+    const nav2=['drivers','staff','mehnat','firms','kb'].map(k=>{
+      const on=navView===k;const n=(k==='kb'||k==='mehnat')?0:(s.data[k]||[]).length;
+      return {label:T(k==='kb'?'Bilim bazasi':k==='mehnat'?'Mehnat shartnomasi':ENT[k].nav),icon:ICON[k],cls:on?'on':'',badge:n?String(n):'',badgeBg:on?'rgba(255,255,255,.22)':'#EEF0F4',
+        go:()=>k==='kb'?this.go('kb'):k==='mehnat'?this.go('mehnat'):this.goE(k,ENT[k].openForm?'eform':'elist')};});
     const nav3=['payments','fond'].map(k=>{
       const on=navView===k;const n=(s.data[k]||[]).length;
       return {label:T(ENT[k].nav),icon:ICON[k],cls:on?'on':'',badge:n?String(n):'',badgeBg:on?'rgba(255,255,255,.22)':'#EEF0F4',go:()=>this.goE(k,'elist')};});
@@ -1934,7 +1954,7 @@ class Component extends DCLogic {
       today:T(now.getDate()+'-'+MONF[now.getMonth()]+', '+now.getFullYear()+'-yil'),
       nav:navDef.map(([v,l])=>({label:l,icon:ICON[v],cls:navView===v?'on':'',go:()=>v==='new'?this.goNewYV():this.go(v)})),
       isDash:s.view==='dash',isList:s.view==='list',isNew:s.view==='new',isView:s.view==='view'&&!!cur,
-      isEList:s.view==='elist',isEForm:s.view==='eform',isKb:s.view==='kb',
+      isEList:s.view==='elist',isEForm:s.view==='eform',isKb:s.view==='kb',isMehnat:s.view==='mehnat',openMehnatTpl:()=>this.openEditor('mehnat'),
       e,nav2,nav3,tpls,
       tagList:TAGS.map(([g,m])=>({tag:'{'+g+'}',mean:T(m)})),
       kbMsg:kbm?T(kbm.text):'',kbMsgBg:kbm&&kbm.ok?'#DCFCE7':'#FEF2F2',kbMsgColor:kbm&&kbm.ok?'#14532D':'#991B1B',flash:s.flash,eq:s.eq,onEq:ev=>this.setState({eq:ev.target.value}),
