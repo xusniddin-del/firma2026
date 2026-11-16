@@ -904,7 +904,7 @@ const NEWCH = /[ŞşÇçÖöĞğ]/;
 const ini = s => {s=String(s||'').trim();if(!s)return '';const m=s.match(/^(sh|ch|[og]['ʻ’‘`ʼ])/i);const x=m?m[0]:s[0];return x.charAt(0).toUpperCase()+x.slice(1).toLowerCase();};
 const fioShort = x => {if(!x)return '';const a=ini(x.ism),b=ini(x.otasi);return [x.familiya,a?(a+'.'+(b||'')):''].filter(Boolean).join(' ');};
 const SKEY = 'firma-alifbo-v1';
-const APP_VER = '2026.11.16-15.00';
+const APP_VER = '2026.11.16-15.15';
 const CFG_KEY = 'firma-sheets-v1';
 const DEFAULT_API = {url:'https://script.google.com/macros/s/AKfycby0hC_HsljZPv04H7ZQDKizrBm_Tbrt4QCGCVcCjikU5vS-dWMX0iHKVNm9eO88bJYxYw/exec',token:'',firm:''};
 const STAFF = ['Akmal Rahimov','Dilnoza Karimova','Sardor Tursunov','Malika Yusupova'];
@@ -1593,38 +1593,24 @@ function parseTex(text){
   const col=Object.keys(CAR_COLORS).find(c=>new RegExp('\\b'+c+'\\b').test(flat));if(col)out.rang=CAR_COLORS[col];
   return out;
 }
-ENT.mehnat = {key:'firma-mehnat-v1', nav:'Mehnat shartnomasi', listTitle:'Mehnat shartnomalari', add:'+ Yangi mehnat shartnomasi', newTitle:'Yangi mehnat shartnomasi', editTitle:'Mehnat shartnomasini tahrirlash', kicker:'Shartnoma tuzish', one:'shartnoma', autoNo:true, doc:true,
-  searchPh:'Xodim, lavozim yoki shartnoma raqami', emptyTitle:'Hali mehnat shartnomasi tuzilmagan', emptyText:"«+ Yangi mehnat shartnomasi» tugmasi bilan birinchi shartnomani tuzing.",
+ENT.mehnat = {key:'firma-mehnat-v1', nav:'Mehnat shartnomasi', listTitle:'Mehnat shartnomalari', add:'+ Yangi mehnat shartnomasi', newTitle:'Yangi mehnat shartnomasi', editTitle:'Mehnat shartnomasini tahrirlash', kicker:"Haydovchini tanlang — qolgani o'zi to'ldiriladi", one:'shartnoma', autoNo:true, doc:true,
+  searchPh:'Haydovchi, davlat raqami yoki shartnoma raqami', emptyTitle:'Hali mehnat shartnomasi tuzilmagan', emptyText:"«+ Yangi mehnat shartnomasi» tugmasi bilan birinchi shartnomani tuzing.",
   sections:[
     {title:'Shartnoma', fields:[
-      {k:'raqam',l:'Shartnoma raqami',req:1,raw:1,num:1,ph:'1'},
-      {k:'sana',l:'Tuzilgan sana',req:1,type:'date',raw:1,today:1},
-      {k:'rahbar',l:'Ish beruvchi vakili (rahbar F.I.Sh.)',ph:'Aliyev Vali Karimovich'},
-      {k:'holat',l:'Holati',opts:['Faol','Bekor qilingan']}]},
-    {title:'Xodim', fields:[
-      {k:'kimTuri',l:'Kim bilan',seg:['Haydovchi','Ichki xodim'],col:'1/-1',reset:['xodimId']},
-      {k:'xodimId',l:'Xodim',req:1,dyn:(f,d)=>(f.kimTuri==='Ichki xodim'?(d.staff||[]):(d.drivers||[])).map(x=>({v:x.id,l:fio(x)})),
-        emptyOpt:f=>f.kimTuri==='Ichki xodim'?"— avval ichki xodim qo'shing —":"— avval haydovchi qo'shing —"}]},
-    {title:'Ish sharoiti', fields:[
-      {k:'lavozim',l:'Lavozimi',req:1,ph:'Haydovchi'},
-      {k:'bolim',l:"Bo'limi",ph:'Transport'},
-      {k:'maosh',l:"Oylik maosh (so'm)",raw:1,num:1,ph:'5000000'},
-      {k:'ishVaqti',l:'Ish vaqti',ph:'09:00–18:00, 6 kunlik'},
-      {k:'ishBoshlash',l:'Ishni boshlash sanasi',req:1,type:'date',raw:1,today:1},
-      {k:'muddatTuri',l:'Shartnoma muddati',seg:['Muddatli','Muddatsiz'],col:'1/-1'},
-      {k:'ishTugash',l:'Tugash sanasi',req:1,type:'date',raw:1,when:f=>f.muddatTuri==='Muddatli'},
-      {k:'sinov',l:'Sinov muddati',opts:["Yo'q",'1 oy','2 oy','3 oy']},
-      {k:'izoh',l:'Izoh',ph:"Qo'shimcha shartlar",col:'1/-1'}]}],
-  cols:['№','Xodim','Lavozim','Maosh','Muddat','Holat'],
-  beforeSave:(x,d)=>{const p=(x.kimTuri==='Ichki xodim'?(d.staff||[]):(d.drivers||[])).find(y=>y.id===x.xodimId);if(p){const c={...p};delete c.rasm;x.xodimSnap=c;x.xodimNomi=fio(p);}return x;},
-  row:(x,T)=>{const left=x.muddatTuri==='Muddatli'&&x.ishTugash?dayDiff(x.ishTugash,today()):null;
-    return [{v:String(x.raqam||'—'),w:700},{v:T(x.xodimNomi||'—'),sub:T(x.kimTuri||''),w:600},{v:T(x.lavozim),sub:T(x.bolim||'')},{v:T(fmt(x.maosh)),w:600},
-      {v:x.muddatTuri==='Muddatli'?fd(x.ishBoshlash)+' – '+fd(x.ishTugash):T('Muddatsiz'),sub:left!==null?(left<0?T('Muddati tugagan'):T('Tugashiga '+left+' kun')):T(fd(x.ishBoshlash)+' dan'),color:left!==null&&left<=30?'#B45309':'inherit'},
-      {v:T(x.holat||'Faol'),color:x.holat==='Bekor qilingan'?'#B91C1C':'#15803D',w:600}];},
-  summary:(list,d,T)=>{const fa=list.filter(x=>x.holat!=='Bekor qilingan');const soon=fa.filter(x=>x.muddatTuri==='Muddatli'&&x.ishTugash&&dayDiff(x.ishTugash,today())<=30);
-    return [{label:'Faol shartnomalar',value:String(fa.length),note:list.length+' ta jami',color:'#15803D',bar:'#22C55E'},
-      {label:'Oylik maosh fondi',value:fmt(sumOf(fa.map(x=>({summa:x.maosh})))),note:'Faol shartnomalar bo\'yicha',color:'#1D4ED8',bar:'#3B82F6'},
-      {label:'30 kun ichida tugaydi',value:String(soon.length),note:'Muddatli shartnomalar',color:'#B45309',bar:'#F59E0B'}];}};
+      {k:'xodimId',l:'Haydovchi',req:1,col:'1/-1',dyn:(f,d)=>(d.drivers||[]).map(x=>({v:x.id,l:fio(x)+(x.davlatRaqam?' · '+x.davlatRaqam:'')})),emptyOpt:()=>"— avval haydovchi qo'shing —"},
+      {k:'raqam',l:'Shartnoma raqami',req:1,raw:1,num:1,ph:'1',hint:'avtomatik'},
+      {k:'sana',l:'Boshlanish sanasi',req:1,type:'date',raw:1,today:1,after:v=>v?{ishTugash:addMonths(v,12)}:{}},
+      {k:'ishTugash',l:'Tugash sanasi',req:1,type:'date',raw:1,hint:'1 yil'}]}],
+  cols:['№','Haydovchi','Mashina','Muddat'],
+  beforeSave:(x,d)=>{x.kimTuri='Haydovchi';x.ishBoshlash=x.sana;x.muddatTuri='Muddatli';x.lavozim=x.lavozim||'Haydovchi';
+    const p=(d.drivers||[]).find(y=>y.id===x.xodimId);if(p){const c={...p};delete c.rasm;x.xodimSnap=c;x.xodimNomi=fio(p);x.mashinaNomi=[p.mashina,p.davlatRaqam].filter(Boolean).join(' · ');}return x;},
+  row:(x,T)=>{const left=x.ishTugash?dayDiff(x.ishTugash,today()):null;
+    return [{v:String(x.raqam||'—'),w:700},{v:T(x.xodimNomi||'—'),w:600},{v:T(x.mashinaNomi||'—')},
+      {v:fd(x.sana||x.ishBoshlash)+' – '+fd(x.ishTugash),sub:left===null?'':left<0?T('Muddati tugagan'):T('Tugashiga '+left+' kun'),color:left!==null&&left<=30?'#B45309':'inherit'}];},
+  summary:(list,d,T)=>{const fa=list.filter(x=>!x.ishTugash||dayDiff(x.ishTugash,today())>=0);const soon=fa.filter(x=>x.ishTugash&&dayDiff(x.ishTugash,today())<=30);
+    return [{label:'Amaldagi shartnomalar',value:String(fa.length),note:list.length+' ta jami',color:'#15803D',bar:'#22C55E'},
+      {label:'30 kun ichida tugaydi',value:String(soon.length),note:'Yangilash kerak bo\'ladi',color:'#B45309',bar:'#F59E0B'},
+      {label:'Muddati tugagan',value:String(list.length-fa.length),note:'Qayta tuzish kerak',color:'#B91C1C',bar:'#EF4444'}];}};
 const STAFF_SEED = [['Rahimov','Akmal','Bosh menejer','Boshqaruv'],['Karimova','Dilnoza','Sotuv menejeri','Sotuv'],['Tursunov','Sardor','Yurist','Yuridik'],['Yusupova','Malika','Hisobchi','Hisobxona']]
   .map(([f,i,l,b],n)=>({id:'x'+n,familiya:f,ism:i,otasi:'',telefon:'+998 90 55'+n+' 1'+n+' 2'+n,lavozim:l,bolim:b,kirgan:'2025-0'+(n+2)+'-01',holat:'Faol'}));
 function loadImage(file,S,cb){
@@ -1700,7 +1686,7 @@ class Component extends DCLogic {
     catch(e){this.setState({sync:'err',syncErr:String(e.message||e),setMsg:{ok:0,text:"Ulanib bo'lmadi: "+errText(e)}});}}
   markRead(keys){const readN=Array.from(new Set([...(this.state.readN||[]),...keys]));this.setState({readN});try{localStorage.setItem(NKEY,JSON.stringify(readN));}catch(e){}this.push('readN',readN);}
   persistE(ent,list){this.setState(st=>({data:{...st.data,[ent]:list}}));try{localStorage.setItem(ENT[ent].key,JSON.stringify(list));}catch(e){}this.push(ent,list);}
-  goE(ent,view){let bf=null;if(view==='eform'){bf=blankE(ent);if(ENT[ent].autoNo){const L=this.state.data[ent]||[];bf.raqam=String(L.reduce((a,c)=>Math.max(a,Number(c.raqam)||0),0)+1);const last=L[0];if(last&&last.rahbar)bf.rahbar=last.rahbar;if(ent==='mehnat'){bf.lavozim='Haydovchi';bf.ishTugash=addMonths(today(),12);}}}
+  goE(ent,view){let bf=null;if(view==='eform'){bf=blankE(ent);if(ENT[ent].autoNo){const L=this.state.data[ent]||[];bf.raqam=String(L.reduce((a,c)=>Math.max(a,Number(c.raqam)||0),0)+1);const last=L[0];if(last&&last.rahbar)bf.rahbar=last.rahbar;if(ent==='mehnat'){bf.ishTugash=addMonths(today(),12);}}}
     this.go(view,{ent,eq:'',flash:'',photoErr:'',scanMsg:null,eForm:bf,eEditId:null});}
   goNewYV(){this.go('new',{form:this.blank(),editId:null});}
   editItem(it){this.go('new',{form:{raqam:String(it.raqam),dan:it.dan,gacha:it.gacha,h1:it.h1,h2:it.h2||'',showH2:!!it.h2,izoh:it.izoh||'',lits:it.lits||'',litsGacha:it.litsGacha||'',yonalish:it.yonalish||''},editId:it.id});}
@@ -1974,7 +1960,7 @@ class Component extends DCLogic {
           if(f.photo){const file=e.target.files&&e.target.files[0];e.target.value='';if(!file)return;
             if(!/^image\//.test(file.type)){this.setState({photoErr:T('Faqat rasm fayli yuklanadi.')});return;}
             loadImage(file,1600,(err,url)=>{if(err){this.setState({photoErr:T("Rasmni o'qib bo'lmadi.")});return;}this.openCrop(f.k,url);});return;}
-          let v=e.target.value;if(f.up)v=v.toUpperCase();if(f.num)v=v.replace(/\D/g,'');setF(f.k,v);}};
+          let v=e.target.value;if(f.up)v=v.toUpperCase();if(f.num)v=v.replace(/\D/g,'');if(f.after){const ex=f.after(v);this.setState(st=>({eForm:{...(st.eForm||blankE(st.ent)),[f.k]:v,...ex}}));return;}setF(f.k,v);}};
       if(f.dyn){const names=f.dyn(ef,s.data).filter(Boolean);
         o.options=[{v:'',l:T(names.length?'— tanlang —':f.emptyOpt(ef))},...names.map(x=>typeof x==='object'?{v:x.v,l:T(x.l)}:{v:x,l:T(x)})];}
       else if(opts)o.options=opts.map(x=>({v:x,l:T(x),cls:val===x?'on':'',pressed:val===x?'true':'false',
