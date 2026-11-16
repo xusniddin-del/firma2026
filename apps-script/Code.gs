@@ -63,6 +63,9 @@ function handle_(req) {
       else writeList_(SHEETS[req.key], req.value || []);
       return out_({ ok: true, at: new Date().toISOString() });
     }
+    if (req.action === 'face') {
+      return out_(findFace_(req.img || '', req.mime || 'image/jpeg'));
+    }
     return out_({ ok: false, error: 'action' });
   } catch (err) {
     return out_({ ok: false, error: String(err) });
@@ -140,4 +143,44 @@ function readChunks_(name) {
   if (!sh || sh.getLastRow() < 2) return {};
   const v = sh.getRange(2, 2, sh.getLastRow() - 1, 1).getValues().map(function (r) { return r[0]; }).join('');
   try { return JSON.parse(v); } catch (e) { return {}; }
+}
+
+
+/* ===== Gemini: rasmdagi yuzni topish (3×4 qirqish uchun) =====
+   Kalit kodda turmaydi. Apps Script → Project Settings (⚙) → Script Properties →
+   Add script property: nomi GEMINI_KEY, qiymati — Google AI Studio kaliti. */
+const GEMINI_MODELS = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-2.5-flash'];
+
+function findFace_(b64, mime) {
+  const key = PropertiesService.getScriptProperties().getProperty('GEMINI_KEY');
+  if (!key) return { ok: false, error: 'nokey' };
+  if (!b64) return { ok: false, error: 'noimg' };
+  const payload = {
+    contents: [{ parts: [
+      { inline_data: { mime_type: mime, data: b64 } },
+      { text: 'Find the face of the main person in this photo (forehead to chin, ear to ear, without hair). ' +
+              'Return only JSON: {"box_2d":[ymin,xmin,ymax,xmax]} with coordinates normalized to 0-1000. ' +
+              'If there is no face return {"box_2d":null}.' }
+    ] }],
+    generationConfig: { responseMimeType: 'application/json', temperature: 0 }
+  };
+  let last = '';
+  for (let i = 0; i < GEMINI_MODELS.length; i++) {
+    const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODELS[i] + ':generateContent', {
+      method: 'post', contentType: 'application/json', headers: { 'x-goog-api-key': key },
+      payload: JSON.stringify(payload), muteHttpExceptions: true
+    });
+    const code = res.getResponseCode(), txt = res.getContentText();
+    if (code === 404) { last = 'model'; continue; }
+    if (code !== 200) return { ok: false, error: 'gemini ' + code + ': ' + txt.slice(0, 200) };
+    try {
+      const j = JSON.parse(txt);
+      const t = j.candidates[0].content.parts.map(function (p) { return p.text || ''; }).join('');
+      const m = JSON.parse(t.replace(/```json|```/g, '').trim());
+      const b = Array.isArray(m) ? (m[0] && m[0].box_2d) : m.box_2d;
+      if (!b || b.length !== 4) return { ok: false, error: 'noface' };
+      return { ok: true, box: b.map(Number), model: GEMINI_MODELS[i] };
+    } catch (e) { return { ok: false, error: 'parse' }; }
+  }
+  return { ok: false, error: last || 'gemini' };
 }
