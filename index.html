@@ -907,7 +907,7 @@ const NEWCH = /[ŞşÇçÖöĞğ]/;
 const ini = s => {s=String(s||'').trim();if(!s)return '';const m=s.match(/^(sh|ch|[og]['ʻ’‘`ʼ])/i);const x=m?m[0]:s[0];return x.charAt(0).toUpperCase()+x.slice(1).toLowerCase();};
 const fioShort = x => {if(!x)return '';const a=ini(x.ism),b=ini(x.otasi);return [capW(x.familiya),a?(a+'.'+(b||'')):''].filter(Boolean).join(' ');};
 const SKEY = 'firma-alifbo-v1';
-const APP_VER = '2026.11.16-16.30';
+const APP_VER = '2026.11.16-16.45';
 const CFG_KEY = 'firma-sheets-v1';
 const DEFAULT_API = {url:'https://script.google.com/macros/s/AKfycby0hC_HsljZPv04H7ZQDKizrBm_Tbrt4QCGCVcCjikU5vS-dWMX0iHKVNm9eO88bJYxYw/exec',token:'',firm:''};
 const STAFF = ['Akmal Rahimov','Dilnoza Karimova','Sardor Tursunov','Malika Yusupova'];
@@ -1779,8 +1779,17 @@ class Component extends DCLogic {
     const done=ok=>this.setState({yvMsg:ok?{ok:1,text:"Hujjat yangi oynada ochildi — chop etish oynasi o'zi chiqadi."}:{ok:0,text:"Brauzer bu oynada chop etishni to'sib qo'ydi. «Word yuklab olish» tugmasini bosing va faylni Word'da chop eting."}});
     if(!node){done(false);return;}
     const dx=!!node.querySelector('.mehdx');
-    const html='<!doctype html><html lang="uz"><head><meta charset="utf-8"><title>Yo\u2018l varaqasi</title><style>'+PRINT_CSS+(dx?'.mehdx section.docx,.mehdx section.docx *{font-family:"Times New Roman",Times,serif !important}@page{size:A4;margin:0}.mehdx section.docx{box-shadow:none!important;margin:0!important;break-after:page}.mehdx section.docx:last-child{break-after:auto}':'')+'</style></head><body>'+node.outerHTML+
-      '<scr'+'ipt>window.addEventListener("load",function(){setTimeout(function(){window.focus();window.print();},350);});</scr'+'ipt></body></html>';
+    /* har bir varaq alohida qutiga solinadi; printerda sig'masa, o'sha varaq avtomatik kichraytiriladi (2-varaqqa o'tib ketmaydi) */
+    let pages=[],extraCss='',styles='';
+    if(dx){styles=Array.from(node.querySelectorAll('style')).map(x=>x.outerHTML).join('');
+      pages=Array.from(node.querySelectorAll('section.docx')).map(x=>'<div class="mehdx">'+x.outerHTML+'</div>');
+      extraCss='.mehdx section.docx,.mehdx section.docx *{font-family:"Times New Roman",Times,serif !important}@page{size:A4;margin:0}.mehdx section.docx{box-shadow:none!important;margin:0!important;height:auto!important;min-height:0!important;overflow:visible!important}.pg{height:296mm;width:210mm}';}
+    else{let cur=[];Array.from(node.childNodes).forEach(n=>{if(n.nodeType===1&&n.classList&&n.classList.contains('pgbreak')){pages.push(cur);cur=[];}else cur.push(n);});pages.push(cur);
+      pages=pages.filter(a=>a.length).map(a=>'<div class="'+node.className+'">'+a.map(n=>n.outerHTML||n.textContent||'').join('')+'</div>');extraCss='.pg{height:276mm;width:190mm}';}
+    const html='<!doctype html><html lang="uz"><head><meta charset="utf-8"><title>Hujjat</title>'+styles+'<style>'+PRINT_CSS+'.pg{overflow:hidden;break-after:page;page-break-after:always}.pg:last-child{break-after:auto;page-break-after:auto}.pgi{transform-origin:top left}.pg .a4,.pg .sheet{padding:0!important;width:auto!important;box-shadow:none!important;margin:0!important;min-height:0!important}@media screen{.pg{margin:0 auto 16px;background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.15)}}'+extraCss+'</style></head><body>'+
+      pages.map(h=>'<div class="pg"><div class="pgi">'+h+'</div></div>').join('')+
+      '<scr'+'ipt>function fit(){document.querySelectorAll(".pg").forEach(function(pg){var i=pg.firstElementChild;i.style.zoom="";var h=i.scrollHeight,H=pg.clientHeight;if(h>H)i.style.zoom=String(Math.floor(H/h*1000)/1000);});}'+
+      'window.addEventListener("load",function(){(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){fit();setTimeout(function(){window.focus();window.print();},350);});});</scr'+'ipt></body></html>';
     let w=null;
     try{const url=URL.createObjectURL(new Blob([html],{type:'text/html'}));w=window.open(url,'_blank');setTimeout(()=>{try{URL.revokeObjectURL(url);}catch(e){}},60000);}catch(e){w=null;}
     if(w){done(true);return;}
